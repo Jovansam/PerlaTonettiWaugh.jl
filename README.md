@@ -50,7 +50,7 @@ The following notebooks compute all of the numerical results and figures present
     cd(dirname(pathof(PerlaTonettiWaugh)))
     ; jupyter lab
     ```
-    where the last step runs your `jupyter lab` in the shell.
+    where the last step runs your `jupyter lab` in the shell. **The ; cannot be copy-and-pasted**; to access shell mode, you must type it manually (and you will see your prompt go red.)
 
     **Note** In either case, the first time the `using` it will be very slow
 
