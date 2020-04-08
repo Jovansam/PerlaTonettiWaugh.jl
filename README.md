@@ -39,7 +39,7 @@ The following notebooks compute all of the numerical results and figures present
     Using the built-in Jupyter is straightforward.  In the Julia terminal
     ```julia
     using PerlaTonettiWaugh, IJulia
-    notebook(detached=true, dir=dirname(pathof(PerlaTonettiWaugh)))
+    jupyterlab(detached=true, dir=dirname(pathof(PerlaTonettiWaugh)))
     ```
 
    **Note:** If this is the first time running a `notebook()` command inside Julia, it may prompt you to install Julia via conda. Hit `yes`. 
