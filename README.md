@@ -42,7 +42,7 @@ The following notebooks compute all of the numerical results and figures present
     jupyterlab(dir=dirname(pathof(PerlaTonettiWaugh)))
     ```
 
-   **Note:** If this is the first time running a `jupyterlab()` command inside Julia, it may prompt you to install Julia via conda. Hit `yes`. Also, this will **hand over control of your Julia session to the notebook.** To get it back, hit `control+c`. 
+   **Note:** If this is the first time running a `jupyterlab()` command inside Julia, it may prompt you to install Julia via conda. Hit `yes`. Also, this will **hand over control of your Julia session to the notebook.** To get it back, hit `control+c` in the Julia REPL.
 
     Alternatively, to use a separate Jupyter installation you may have installed with Anaconda,
     ```julia
