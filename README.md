@@ -14,14 +14,14 @@ As in the derivation, the code has a "warmup" model without trade or monopolisti
 ## Directory of Results
 The following notebooks compute all of the numerical results and figures presented in the paper. These notebooks use code from /src/full.
 
-* **Steady State Analysis**: 
+* **Steady State Analysis**:
     * [Baseline vs. 10%-Lower-Trade-Cost Comparison, Baseline vs. Autarky Comparison, Sampson Calibration, and No GBM Firm Dynamics Calibration](SteadyState.ipynb)
     * [Baseline Local Welfare Change Decomposition](WelfareChangeDecomposition.ipynb)
     * [Upsilon/Delta/Chi Figures](ChiUpsilonDeltaFigures.ipynb) and [Upsilon/Delta/Chi Welfare Decomposition](ChiUpsilonDelta.ipynb)
     * [Zeta Normalization](ZetaNormalization.ipynb)
 
 * **Transition Dynamics**:
-    * [Computation and Welfare Gain](TransitionDynamics.ipynb) 
+    * [Computation and Welfare Gain](TransitionDynamics.ipynb)
     * [Figures](TransitionDynamicsFigures.ipynb)
 
 ## Installation and Use
@@ -39,13 +39,13 @@ The following notebooks compute all of the numerical results and figures present
     Using the built-in Jupyter is straightforward.  In the Julia terminal
     ```julia
     using PerlaTonettiWaugh, IJulia
-    notebook(detached=true, dir=dirname(dirname(pathof(PerlaTonettiWaugh))))
+    notebook(detached=true, dir=dirname(pathof(PerlaTonettiWaugh)))
     ```
 
     Alternatively, to use a separate Jupyter installation you may have installed with Anaconda,
     ```julia
     using PerlaTonettiWaugh
-    cd(dirname(dirname(pathof(PerlaTonettiWaugh))))
+    cd(dirname(pathof(PerlaTonettiWaugh)))
     ; jupyter lab
     ```
     where the last step runs your `jupyter lab` in the shell.
