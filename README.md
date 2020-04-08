@@ -42,6 +42,8 @@ The following notebooks compute all of the numerical results and figures present
     notebook(detached=true, dir=dirname(pathof(PerlaTonettiWaugh)))
     ```
 
+   **Note:** If this is the first time running a `notebook()` command inside Julia, it may prompt you to install Julia via conda. Hit `yes`. 
+
     Alternatively, to use a separate Jupyter installation you may have installed with Anaconda,
     ```julia
     using PerlaTonettiWaugh
