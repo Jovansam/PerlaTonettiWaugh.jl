@@ -28,11 +28,18 @@ The following notebooks compute all of the numerical results and figures present
 
 1. Follow the instructions to [install Julia and Jupyter](https://lectures.quantecon.org/jl/getting_started.html)
 
-2. Open the Julia REPL (see the documentation above) and then install the package (by entering package mode) with
+2. Open the Julia REPL (see the documentation above) and then install the package (by entering package mode with `]`) with
 
     ```julia
-    ] add https://github.com/jlperla/PerlaTonettiWaugh.jl.git
+    ] dev https://github.com/jlperla/PerlaTonettiWaugh.jl.git
     ```
+    
+2a. **Optional**: To install the exact set of packages used here, run the following 
+
+   ```julia 
+   ] activate PerlaTonettiWaugh 
+   ] instantiate
+   ```
 
 3. There are several ways you can run the notebooks after installation
 
