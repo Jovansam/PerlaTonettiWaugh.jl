@@ -34,12 +34,12 @@ The following notebooks compute all of the numerical results and figures present
     ] dev https://github.com/jlperla/PerlaTonettiWaugh.jl.git
     ```
     
-2a. **Optional**: To install the exact set of packages used here, run the following 
+   2a. **Optional**: To install the exact set of packages used here, run the following 
 
-   ```julia 
-   ] activate PerlaTonettiWaugh 
-   ] instantiate
-   ```
+      ```julia 
+      ] activate PerlaTonettiWaugh 
+      ] instantiate
+      ```
 
 3. There are several ways you can run the notebooks after installation
 
