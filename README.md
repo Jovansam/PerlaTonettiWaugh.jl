@@ -31,13 +31,15 @@ The following notebooks compute all of the numerical results and figures present
 2. Open the Julia REPL (see the documentation above) and then install the package (by entering package mode with `]`) with
 
     ```julia
-    ] dev https://github.com/jlperla/PerlaTonettiWaugh.jl.git
+    ] add https://github.com/jlperla/PerlaTonettiWaugh.jl.git
     ```
     
-   2a. **Optional**: To install the exact set of packages used here, run the following 
+   2a. **Optional**: To install the exact set of packages used here (as opposed to using existing compatible versions on your machine), run the following 
 
       ```julia 
-      ] activate PerlaTonettiWaugh 
+      using PerlaTonettiWaugh # will be slow the first time, due to precompilation
+      cd(pkgdir(PerlaTonettiWaugh))
+      ] activate .
       ] instantiate
       ```
 
