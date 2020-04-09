@@ -39,7 +39,7 @@ The following notebooks compute all of the numerical results and figures present
     Using the built-in Jupyter is straightforward.  In the Julia terminal
     ```julia
     using PerlaTonettiWaugh, IJulia
-    jupyterlab(dir=dirname(pathof(PerlaTonettiWaugh)))
+    jupyterlab(dir=pkgdir(PerlaTonettiWaugh))
     ```
 
    **Note:** If this is the first time running a `jupyterlab()` command inside Julia, it may prompt you to install Julia via conda. Hit `yes`. Also, this will **hand over control of your Julia session to the notebook.** To get it back, hit `control+c` in the Julia REPL.
@@ -47,7 +47,7 @@ The following notebooks compute all of the numerical results and figures present
     Alternatively, to use a separate Jupyter installation you may have installed with Anaconda,
     ```julia
     using PerlaTonettiWaugh
-    cd(dirname(pathof(PerlaTonettiWaugh)))
+    cd(pkgdir(PerlaTonettiWaugh))
     ; jupyter lab
     ```
     where the last step runs your `jupyter lab` in the shell. **The ; cannot be copy-and-pasted**; to access shell mode, you must type it manually (and you will see your prompt go red.)
