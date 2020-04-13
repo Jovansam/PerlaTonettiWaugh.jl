@@ -32,8 +32,8 @@ disp(trade_moments)
 disp('')
 disp('Entry Moment')
 disp(entry_moments)
-disp('Firm Moments')
-disp(firm_moments )
+disp('Firm Moments (LHS Table 3)')
+disp(rot90(firm_moments,2))
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -110,6 +110,9 @@ disp([new_cal,params.delta,params.rho])
 
 all_stuff = calibrate_growth(new_cal,params,moments,0);
 
+
+model_firm_moments = all_stuff(5:end,2)';
+model_firm_moments = [model_firm_moments(1:4);model_firm_moments(5:end)];
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 disp('')
 disp('')
@@ -126,9 +129,11 @@ disp([all_stuff(2,2)])
 disp('')
 disp('Entry Moment')
 disp(params.delta)
-disp('Firm Moments')
-disp(reshape(all_stuff(5:end,2)',2,4))
+disp('Firm Moments (RHS Table 3)')
+disp(rot90(model_firm_moments,2))
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+disp('Correlation Model and Data Firm Moments')
+disp(corr(firm_moments(:),model_firm_moments(:)))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% steady state welfare gain % use julia for this stuff
 % params.d = new_cal(1);
