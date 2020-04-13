@@ -20,7 +20,9 @@ As in the derivation, the code has a "warmup" model without trade or monopolisti
 
 The following notebooks compute all of the quantitative results and figures presented in the paper. They are organized by Section in accordance with the NBER working paper version.
 
-- **[Section 7-1: Calibration](section_7-1.ipynb)** jupyter notebook which direct pulls data and constructs moments for the calibration of the PTW model.
+- **[Section 7-1: Calibration](section_7-1.ipynb)** jupyter notebook which direct pulls data and constructs moments for the calibration of the PTW model. Output are moments as ``.csv`` files which are then read in during the calibration routine.
+
+- **[Section 7-2: Calibration Results](section_7-2.ipynb)** jupyter notebook which calls the MATLAB code to implement the calibration procedure which finds parameter values such that moments in model best fit moments in data. Output is at [``/src/calibration/output/main_results/calibration_params.csv``](/src/calibration/output/main_results/calibration_params.csv) which contains the parameter values in the following order: d, theta, kappa, 1/chi, mu, upsilon, sigma, delta, rho.
 
 
 * **Steady State Analysis**:
