@@ -20,10 +20,17 @@ As in the derivation, the code has a "warmup" model without trade or monopolisti
 
 The following notebooks compute all of the quantitative results and figures presented in the paper. They are organized by Section in accordance with the NBER working paper version.
 
-- **[Section 7-1: Calibration](section_7-1.ipynb)** jupyter notebook which direct pulls data and constructs moments for the calibration of the PTW model. Output are moments as ``.csv`` files which are then read in during the calibration routine.
+- **[Section 7-1: Calibration](section_7-1.ipynb)** jupyter (python) notebook which direct pulls data and constructs moments for the calibration of the PTW model. Output are moments as ``.csv`` files which are then read in during the calibration routine.
 
-- **[Section 7-2: Calibration Results](section_7-2.ipynb)** jupyter notebook which calls the MATLAB code to implement the calibration procedure which finds parameter values such that moments in model best fit moments in data. Output is at [``/src/calibration/output/main_results/calibration_params.csv``](/src/calibration/output/main_results/calibration_params.csv) which contains the parameter values in the following order: d, theta, kappa, 1/chi, mu, upsilon, sigma, delta, rho. 
+- **[Section 7-2: Calibration Results](section_7-2.ipynb)** jupyter (python) notebook which calls the MATLAB code to implement the calibration procedure which finds parameter values such that moments in model best fit moments in data. Output is at [``/src/calibration/output/main_results/calibration_params.csv``](/src/calibration/output/main_results/calibration_params.csv) which contains the parameter values in the following order: d, theta, kappa, 1/chi, mu, upsilon, sigma, delta, rho.
 
+- **Section 7.3 The Sources of the Welfare Gains from Trade—A Quantitative Decomposition** jupyter (julia) notebook reads in ``csv`` from above and run [Baseline Local Welfare Change Decomposition](WelfareChangeDecomposition.ipynb)
+
+- **Section 7.4 The Welfare Effects of a Reduction in Trade Costs** Need to fix the notebooks up to line up exactly with this.
+
+- **[Section 7.5. The Role of Firm Dynamics and Adoption Costs](section_7-5.ipynb)** jupyter notebook (i) which calls MATLAB code implement alternative calibration/computation for different GBM and delta shock parameter values and (ii) plots the results corresponding with Figure 6 and 7.
+
+---
 
 * **Steady State Analysis**:
     * [Baseline vs. 10%-Lower-Trade-Cost Comparison, Baseline vs. Autarky Comparison, Sampson Calibration, and No GBM Firm Dynamics Calibration](SteadyState.ipynb)
@@ -35,7 +42,9 @@ The following notebooks compute all of the quantitative results and figures pres
     * [Computation and Welfare Gain](TransitionDynamics.ipynb)
     * [Figures](TransitionDynamicsFigures.ipynb)
 
-## Installation and Use
+---
+
+### Installation and Use
 
 1. Follow the instructions to [install Julia and Jupyter](https://lectures.quantecon.org/jl/getting_started.html)
 
