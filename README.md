@@ -22,11 +22,11 @@ The following notebooks compute all of the quantitative results and figures pres
 
 - **[Section 7-1: Calibration](section_7-1.ipynb)** jupyter (python) notebook which direct pulls data and constructs moments for the calibration of the PTW model. Output are moments as ``.csv`` files which are then read in during the calibration routine.
 
-- **[Section 7-2: Calibration Results](section_7-2.ipynb)** jupyter (python) notebook which calls the MATLAB code to implement the calibration procedure which finds parameter values such that moments in model best fit moments in data. Output is at [``/src/calibration/output/main_results/calibration_params.csv``](/src/calibration/output/main_results/calibration_params.csv) which contains the parameter values in the following order: d, theta, kappa, 1/chi, mu, upsilon, sigma, delta, rho.
+- **[Section 7-2: Calibration Results](section_7-2.ipynb)** jupyter (python) notebook which calls the MATLAB code to implement the calibration procedure which finds parameter values such that moments in model best fit moments in data. Output is at [``/parameters/calibration_params.csv``](/parameters/calibration_params.csv) which contains the parameter values in the with headers for each column describing the associated parameter.
 
-- **Section 7.3 The Sources of the Welfare Gains from Trade—A Quantitative Decomposition** jupyter (julia) notebook reads in [``/src/calibration/output/main_results/calibration_params.csv``](/src/calibration/output/main_results/calibration_params.csv)  from above and run [Baseline Local Welfare Change Decomposition](WelfareChangeDecomposition.ipynb)
+- **Section 7.3 The Sources of the Welfare Gains from Trade—A Quantitative Decomposition** jupyter (julia) notebook reads in [``/parameters/calibration_params.csv``](/parameters/calibration_params.csv)  from above and run [Baseline Local Welfare Change Decomposition](WelfareChangeDecomposition.ipynb)
 
-- **Section 7.4 The Welfare Effects of a Reduction in Trade Costs** Need to fix the notebooks up to line up exactly with this. So somethink like this: (i) reads in [``/src/calibration/output/main_results/calibration_params.csv``](/src/calibration/output/main_results/calibration_params.csv) (ii) [Computation and Welfare Gain](TransitionDynamics.ipynb) (iii) [Figures](TransitionDynamicsFigures.ipynb)
+- **Section 7.4 The Welfare Effects of a Reduction in Trade Costs** Need to fix the notebooks up to line up exactly with this. So somethink like this: (i) reads in [``/parameters/calibration_params.csv``](/parameters/calibration_params.csv) (ii) [Computation and Welfare Gain](TransitionDynamics.ipynb) (iii) [Figures](TransitionDynamicsFigures.ipynb)
 
 - **Section 7.4 The Welfare Effects of a Reduction in Trade Costs, Further Analysis** Reads in the correct files and does stuff here [Baseline vs. 10%-Lower-Trade-Cost Comparison, Baseline vs. Autarky Comparison, Sampson Calibration, and No GBM Firm Dynamics Calibration](SteadyState.ipynb)
 
