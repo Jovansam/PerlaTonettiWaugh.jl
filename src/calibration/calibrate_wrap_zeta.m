@@ -64,6 +64,7 @@ disp(zeta_scale(yyy))
 
 params.zeta = zeta_scale(yyy);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+params.gamma = 1.0001;
 initial_val = [3.0220    4.9898    0.1042.*params.zeta    7.8833   -0.0311    0.0483    3.1673];
 
 options = optimset('Display','final','MaxFunEvals',5e4,'MaxIter',1e5);
@@ -103,10 +104,21 @@ disp('Firm Moments')
 disp(reshape(all_stuff(5:end,2)',2,4))
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+params.d = new_cal(1);
+params.theta = new_cal(2);
+params.kappa = new_cal(3);
+params.chi = 1/new_cal(4);
+params.mu = new_cal(5);
+params.upsilon = new_cal(6);
+params.sigma = new_cal(7);
+params.gamma = 1.0;
+params.dT = (new_cal(1)-1).*0.90 + 1;
 
-filename =  join(['./output/robust/zeta/calibration_zeta_',num2str(params.zeta),'.csv']);
+final_cal = [params.d, params.theta, params.kappa, params.chi, params.mu, params.upsilon, params.sigma, params.delta, params.rho, zeta_scale(yyy)...
+    params.n, params.eta, params.Theta, params.gamma, params.dT];
+%save calibration final_cal
 
-final_cal = [new_cal,params.delta,params.rho,zeta_scale(yyy)];
+filename =  join(['../../parameters/calibration_zeta_',num2str(params.zeta),'.csv']);
 
 writematrix(final_cal,filename)
 
