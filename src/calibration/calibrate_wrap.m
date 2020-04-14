@@ -192,7 +192,7 @@ T = today('datetime');
 
 save cal_params new_cal T
 
-final_cal = [new_cal,params.delta,params.rho];
+final_cal = [new_cal,params.delta,params.rho,params.zeta];
 %save calibration final_cal
 
 writematrix(final_cal,'./output/main_results/calibration_params.csv')
