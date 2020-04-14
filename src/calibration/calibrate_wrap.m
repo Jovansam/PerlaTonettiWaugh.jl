@@ -146,8 +146,7 @@ disp(corr(firm_moments(:),model_firm_moments(:)))
 % 
 % [baseline, b_welfare] = compute_growth_fun_cal(params);
 %     
-% low_tau = (new_cal(1)-1).*0.90 + 1;
-% params.d = low_tau;
+
 % 
 % [counterfact, c_welfare] = compute_growth_fun_cal(params);
 %     
@@ -192,10 +191,44 @@ T = today('datetime');
 
 save cal_params new_cal T
 
-final_cal = [new_cal,params.delta,params.rho,params.zeta];
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% how the julia set up looks
+
+%parameter_defaults_tests = @with_kw (? = 0.0215,
+%                                ? = 3.1725,
+%                                N = 10,
+%                                ? = 5.0018,
+%                                ? = 1.00,
+%                                ? = 0.0732,
+%                                ? = 1.0,
+%                                ? = 0.,
+%                                Theta = 1,
+%                                ? = 1/5.9577,
+%                                ? = 0.0484 ,
+%                                ? = -0.0189,
+%                                ? = 0.02,
+%                                d_0 = 3.0426,
+%                                d_T = 2.83834)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% the order (15?)
+% 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+% d_0, ?, ?, ?, ?, ?, ?, ?, ?, ?, N  ,?, Theta, ?, d_T
+params.d = new_cal(1);
+params.theta = new_cal(2);
+params.kappa = new_cal(3);
+params.chi = 1/new_cal(4);
+params.mu = new_cal(5);
+params.upsilon = new_cal(6);
+params.sigma = new_cal(7);
+params.gamma = 1.0;
+params.dT = (new_cal(1)-1).*0.90 + 1;
+
+
+final_cal = [params.d, params.theta, params.kappa, params.chi, params.mu, params.upsilon, params.sigma, params.delta, params.rho, params.zeta...
+    params.n, params.eta, params.Theta, params.gamma, params.dT];
 %save calibration final_cal
 
-writematrix(final_cal,'./output/main_results/calibration_params.csv')
+writematrix(final_cal,'../../parameters/calibration_params.csv')
 
 growth_trade = all_stuff(1:4,[1,2]);
 firm_dynamics = all_stuff(5:end,[1,2]);    
