@@ -114,13 +114,15 @@ params.sigma = new_cal(7);
 params.gamma = 1.0;
 params.dT = (new_cal(1)-1).*0.90 + 1;
 
-final_cal = [params.d, params.theta, params.kappa, params.chi, params.mu, params.upsilon, params.sigma, params.delta, params.rho, zeta_scale(yyy)...
-    params.n, params.eta, params.Theta, params.gamma, params.dT];
-%save calibration final_cal
+
+header = {'theta', 'kappa', 'chi', 'mu', 'upsilon', 'zeta', 'delta', 'N', 'gamma', 'eta', 'Theta', 'd_0', 'd_T'};
+
+final_cal = [params.theta, params.kappa, params.chi, params.mu, params.upsilon,  zeta_scale(yyy), params.delta...
+    params.n, params.gamma, params.eta, params.Theta,params.d, params.dT];
 
 filename =  join(['../../parameters/calibration_zeta_',num2str(params.zeta),'.csv']);
 
-writematrix(final_cal,filename)
+writecell([header; num2cell(final_cal)],filename)
 
 end
 
