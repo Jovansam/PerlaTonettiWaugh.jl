@@ -224,11 +224,15 @@ params.gamma = 1.0;
 params.dT = (new_cal(1)-1).*0.90 + 1;
 
 
-final_cal = [params.d, params.theta, params.kappa, params.chi, params.mu, params.upsilon, params.sigma, params.delta, params.rho, params.zeta...
-    params.n, params.eta, params.Theta, params.gamma, params.dT];
+header = {'theta', 'kappa', 'chi', 'mu', 'upsilon', 'zeta', 'delta', 'N', 'gamma', 'eta', 'Theta', 'd_0', 'd_T'};
+
+final_cal = [params.theta, params.kappa, params.chi, params.mu, params.upsilon, params.zeta, params.delta...
+    params.n, params.gamma, params.eta, params.Theta,params.d, params.dT];
+    
+
 %save calibration final_cal
 
-writematrix(final_cal,'../../parameters/calibration_params.csv')
+writecell([header; num2cell(final_cal)],'../../parameters/calibration_params.csv')
 
 growth_trade = all_stuff(1:4,[1,2]);
 firm_dynamics = all_stuff(5:end,[1,2]);    
