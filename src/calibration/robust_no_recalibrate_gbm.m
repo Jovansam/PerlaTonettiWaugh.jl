@@ -94,8 +94,11 @@ cal_params = [];
 
 record_values = [record_values; baseline(1,1),counterfact(1,1),baseline(1,1)-counterfact(1,1),lambda_gain, params.upsilon];
 
-cal_params = [cal_params; baseline(1,1), params.d, params.theta,...
-        params.kappa, 1/params.chi, params.mu, params.upsilon, params.sigma, params.delta];
+params.dT = (new_cal(1)-1).*0.90 + 1;
+    
+    %{'theta', 'kappa', 'chi', 'mu', 'upsilon', 'zeta', 'delta', 'N', 'gamma', 'eta', 'Theta', 'd_0', 'd_T'};
+cal_params = [cal_params; baseline(1,1), params.theta, params.kappa, params.chi, params.mu, params.upsilon, params.zeta, params.delta...
+    params.n, 1.0, params.eta, params.Theta, params.d, params.dT];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -118,13 +121,17 @@ for zzz = 1:length(scale_values)
     
     [baseline, b_welfare] = compute_growth_fun_cal(params);
     
-    cal_params = [cal_params; baseline(1,1), params.d, params.theta,...
-        params.kappa, 1/params.chi, params.mu, params.upsilon, params.sigma, params.delta];
+    %cal_params = [cal_params; baseline(1,1), params.d, params.theta,...
+     %   params.kappa, 1/params.chi, params.mu, params.upsilon, params.sigma, params.delta];
+    
+    params.dT = (new_cal(1)-1).*0.90 + 1;
+    
+    %{'theta', 'kappa', 'chi', 'mu', 'upsilon', 'zeta', 'delta', 'N', 'gamma', 'eta', 'Theta', 'd_0', 'd_T'};
+    cal_params = [cal_params; baseline(1,1), params.theta, params.kappa, params.chi, params.mu, params.upsilon, params.zeta, params.delta...
+    params.n, 1.0, params.eta, params.Theta, params.d, params.dT];
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        
-    low_tau = (new_cal(1)-1).*0.90 + 1;
-    params.d = low_tau;
+    params.d = params.dT;
     
     [counterfact, c_welfare] = compute_growth_fun_cal(params);
     
@@ -149,14 +156,18 @@ save(filename_two ,'cal_params')
 
 [~,idx] = min(abs(cal_params(:,1)-params.gtarget));
 disp('Parameters for given chi which deliver growth closest to baseline growth')
-disp('d, theta, kappa, 1/chi, mu, upsilon, sigma, delta, rho')
-disp([cal_params(idx,:),params.rho])
+header = {'g', 'theta', 'kappa', 'chi', 'mu', 'upsilon', 'zeta', 'delta', 'N', 'gamma', 'eta', 'Theta', 'd_0', 'd_T'};
+disp(header)
+disp([cal_params(idx,:)])
 
-closest_chi = [closest_chi; cal_params(idx,:)];
+closest_chi = [closest_chi; cal_params(idx,2:end)];
 end
 
 save('./output/robust/gbm/closest_chi_params' ,'closest_chi')
-writematrix(closest_chi,'./output/robust/gbm/closest_chi_params.csv')
+%writematrix(closest_chi,'./output/robust/gbm/closest_chi_params.csv')
+
+header = {'theta', 'kappa', 'chi', 'mu', 'upsilon', 'zeta', 'delta', 'N', 'gamma', 'eta', 'Theta', 'd_0', 'd_T'};
+writecell([header; num2cell(closest_chi)],'../../parameters/closest_chi_params.csv')
 
 rmpath('./eq_functions');
 rmpath('./markov_chain');
