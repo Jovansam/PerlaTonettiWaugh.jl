@@ -195,6 +195,6 @@ end
 # end
 
 # === test utilities === #
-# p = load_parameters("../../parameters/calibration_params.csv")
-# p = merge(p, (d = p.d_0,))
-# @test stationary_algebraic(p, settings_defaults()) isa NamedTuple # just needs to run
+p = load_parameters("full/calibration_params.csv") # because this is included in runtests.jl, full path required
+p = merge(p, (d = p.d_0,))
+@test stationary_algebraic(p, settings_defaults()) isa NamedTuple # just needs to run
