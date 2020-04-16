@@ -160,14 +160,19 @@ header = {'g', 'theta', 'kappa', 'chi', 'mu', 'upsilon', 'zeta', 'delta', 'N', '
 disp(header)
 disp([cal_params(idx,:)])
 
+filename =  join(['../../parameters/calibration_chi_',num2str(round(params.chi,2)),'.csv']);
+header = {'theta', 'kappa', 'chi', 'mu', 'upsilon', 'zeta', 'delta', 'N', 'gamma', 'eta', 'Theta', 'd_0', 'd_T'};
+writecell([header; num2cell(cal_params(idx,2:end))],filename)
+
 closest_chi = [closest_chi; cal_params(idx,2:end)];
+
 end
 
 save('./output/robust/gbm/closest_chi_params' ,'closest_chi')
 %writematrix(closest_chi,'./output/robust/gbm/closest_chi_params.csv')
 
-header = {'theta', 'kappa', 'chi', 'mu', 'upsilon', 'zeta', 'delta', 'N', 'gamma', 'eta', 'Theta', 'd_0', 'd_T'};
-writecell([header; num2cell(closest_chi)],'../../parameters/closest_chi_params.csv')
+%
+%writecell([header; num2cell(closest_chi)],'../../parameters/closest_chi_params.csv')
 
 rmpath('./eq_functions');
 rmpath('./markov_chain');

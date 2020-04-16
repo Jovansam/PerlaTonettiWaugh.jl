@@ -14,6 +14,7 @@ entry_moments = load('./data/entry_moment.csv', '-ascii');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 disp('')
 disp('')
+disp('Calbirated values computed on date')
 disp(today('datetime'))
 disp('')
 disp('')
