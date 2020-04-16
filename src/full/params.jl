@@ -75,3 +75,5 @@ model_cachename(parameters, settings) = join(hash((
                                     stationary_x0 = typeof(settings.stationary_x0),
                                     fixedpoint_x0 = typeof(settings.fixedpoint_x0)))
 )))
+
+load_parameters(filepath::String) = load(filepath) |> collect |> first
