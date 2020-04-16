@@ -193,3 +193,6 @@ end
 #         sol_λ_perturbed[k] isa Number && k != :U_bar && @test sol_λ_perturbed[k] ≈ full_0[k] atol = 0.1
 #     end
 # end
+
+# === test utilities === #
+@test stationary_algebraic(p) isa NamedTuple # just needs to run

@@ -76,4 +76,9 @@ model_cachename(parameters, settings) = join(hash((
                                     fixedpoint_x0 = typeof(settings.fixedpoint_x0)))
 )))
 
-load_parameters(filepath::String) = load(filepath) |> collect |> first
+function load_parameters(filepath::String)
+    tmp = load(filepath) |> collect |> first
+    return (θ = tmp.theta, κ = tmp.kappa, χ = tmp.chi, μ = tmp.mu, υ = tmp.upsilon,
+            ζ = tmp.zeta, δ = tmp.delta, N = tmp.N, γ = tmp.gamma, η = tmp.eta, Theta = tmp.Theta,
+            d_0 = tmp.d_0, d_T = tmp.D_T)
+end
