@@ -85,7 +85,7 @@ low_tau = (new_cal(1)-1).*0.90 + 1;
 params.d = low_tau;
 
 [counterfact, c_welfare] = compute_growth_fun_cal(params);
-
+params.d = new_cal(1);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 lambda_gain = exp((params.rho).*(c_welfare - b_welfare)) - 1;
 
