@@ -43,11 +43,14 @@ The following notebooks compute all of the quantitative results and figures pres
     ] add https://github.com/jlperla/PerlaTonettiWaugh.jl.git
     ```
 
-   2a. **Optional**: To install the exact set of packages used here (as opposed to using existing compatible versions on your machine), run the following (**note** that `]` cannot be copy-pasted; you need to type it to enter the REPL mode.)
+   2a. **Optional, but strongly encouraged**: To install the exact set of packages used here (as opposed to using existing compatible versions on your machine), first run the following in the REPL
 
       ```julia
       using PerlaTonettiWaugh # will be slow the first time, due to precompilation
       cd(pkgdir(PerlaTonettiWaugh))
+      ```
+      Then, enter the package manager in the REPL  (**note** that `]` cannot be copy-pasted on OSX; you need to type it to enter the REPL mode.)
+      ```julia
       ] activate .; instantiate
       ```
 
