@@ -224,10 +224,10 @@ params.gamma = 1.0;
 params.dT = (new_cal(1)-1).*0.90 + 1;
 
 
-header = {'theta', 'kappa', 'chi', 'mu', 'upsilon', 'zeta', 'delta', 'N', 'gamma', 'eta', 'Theta', 'd_0', 'd_T'};
+header = {'theta', 'kappa', 'chi', 'mu', 'upsilon', 'zeta', 'delta', 'N', 'gamma', 'eta', 'Theta', 'd_0', 'd_T', 'rho', 'sigma'};
 
 final_cal = [params.theta, params.kappa, params.chi, params.mu, params.upsilon, params.zeta, params.delta...
-    params.n, params.gamma, params.eta, params.Theta,params.d, params.dT];
+    params.n, params.gamma, params.eta, params.Theta,params.d, params.dT, params.rho, params.sigma];
     
 
 %save calibration final_cal

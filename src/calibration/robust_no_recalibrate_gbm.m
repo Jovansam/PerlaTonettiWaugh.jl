@@ -98,7 +98,7 @@ params.dT = (new_cal(1)-1).*0.90 + 1;
     
     %{'theta', 'kappa', 'chi', 'mu', 'upsilon', 'zeta', 'delta', 'N', 'gamma', 'eta', 'Theta', 'd_0', 'd_T'};
 cal_params = [cal_params; baseline(1,1), params.theta, params.kappa, params.chi, params.mu, params.upsilon, params.zeta, params.delta...
-    params.n, 1.0, params.eta, params.Theta, params.d, params.dT];
+    params.n, 1.0, params.eta, params.Theta, params.d, params.dT, params.rho, params.sigma];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -128,7 +128,7 @@ for zzz = 1:length(scale_values)
     
     %{'theta', 'kappa', 'chi', 'mu', 'upsilon', 'zeta', 'delta', 'N', 'gamma', 'eta', 'Theta', 'd_0', 'd_T'};
     cal_params = [cal_params; baseline(1,1), params.theta, params.kappa, params.chi, params.mu, params.upsilon, params.zeta, params.delta...
-    params.n, 1.0, params.eta, params.Theta, params.d, params.dT];
+    params.n, 1.0, params.eta, params.Theta, params.d, params.dT, params.rho, params.sigma];
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     params.d = params.dT;
@@ -161,7 +161,7 @@ disp(header)
 disp([cal_params(idx,:)])
 
 filename =  join(['../../parameters/calibration_chi_',num2str(round(params.chi,2)),'.csv']);
-header = {'theta', 'kappa', 'chi', 'mu', 'upsilon', 'zeta', 'delta', 'N', 'gamma', 'eta', 'Theta', 'd_0', 'd_T'};
+header = {'theta', 'kappa', 'chi', 'mu', 'upsilon', 'zeta', 'delta', 'N', 'gamma', 'eta', 'Theta', 'd_0', 'd_T', 'rho', 'sigma'};
 writecell([header; num2cell(cal_params(idx,2:end))],filename)
 
 closest_chi = [closest_chi; cal_params(idx,2:end)];
