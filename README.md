@@ -24,9 +24,9 @@ The following notebooks compute all of the quantitative results and figures pres
 
 - **[Section 7-2: Calibration Results](section_7-2.ipynb)** jupyter (python) notebook which calls the MATLAB code to implement the calibration procedure which finds parameter values such that moments in model best fit moments in data. Output is at [``/parameters/calibration_params.csv``](/parameters/calibration_params.csv) which contains the parameter values in the with headers for each column describing the associated parameter.
 
-- **Section 7.3 The Sources of the Welfare Gains from Trade—A Quantitative Decomposition** jupyter (julia) notebook reads in [``/parameters/calibration_params.csv``](/parameters/calibration_params.csv)  from above and run [Baseline Local Welfare Change Decomposition](WelfareChangeDecomposition.ipynb)
+- **Section 7.3 The Sources of the Welfare Gains from Trade—A Quantitative Decomposition** jupyter (julia) notebook run [Baseline Local Welfare Change Decomposition](WelfareChangeDecomposition.ipynb)
 
-- **[Section 7.4 The Welfare Effects of a Reduction in Trade Costs](section_7-4_main.ipynb)** jupyter (python) notebook which (i) calls julia notebook [TransitionDynamics.ipynb]((TransitionDynamics.ipynb) and computes the transition dynamics of the economy and (ii) plots the results to match up with Figures 1-5 of paper.
+- **[Section 7.4 The Welfare Effects of a Reduction in Trade Costs](section_7-4_main.ipynb)** jupyter (python) notebook which (i) calls julia notebook [TransitionDynamics.ipynb](TransitionDynamics.ipynb) and computes the transition dynamics of the economy and (ii) plots the results to match up with Figures 1-5 of paper.
 
 - **[Section 7.4 The Welfare Effects of a Reduction in Trade Costs, Further Analysis](section_7-4_more.ipynb)** jupyter (python) notebook which (i) performs calibration routines by calling MATLAB routines and (ii) computes welfare gains (by calling julia notebook [SteadyState.ipynb](SteadyState.ipynb)) for alternatives (ACR, Sampson, Atkenson and Burstein, No GBM).
 
