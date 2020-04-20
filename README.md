@@ -26,11 +26,11 @@ The following notebooks compute all of the quantitative results and figures pres
 
 - **Section 7.3 The Sources of the Welfare Gains from Trade—A Quantitative Decomposition** jupyter (julia) notebook reads in [``/parameters/calibration_params.csv``](/parameters/calibration_params.csv)  from above and run [Baseline Local Welfare Change Decomposition](WelfareChangeDecomposition.ipynb)
 
-- **Section 7.4 The Welfare Effects of a Reduction in Trade Costs** Need to fix the notebooks up to line up exactly with this. So somethink like this: (i) reads in [``/parameters/calibration_params.csv``](/parameters/calibration_params.csv) (ii) [Computation and Welfare Gain](TransitionDynamics.ipynb) (iii) [Figures](TransitionDynamicsFigures.ipynb)
+- **[Section 7.4 The Welfare Effects of a Reduction in Trade Costs](section_7-4_main.ipynb)** jupyter (python) notebook which (i) calls julia notebook [TransitionDynamics.ipynb]((TransitionDynamics.ipynb) and computes the transition dynamics of the economy and (ii) plots the results to match up with Figures 1-5 of paper.
 
-- **Section 7.4 The Welfare Effects of a Reduction in Trade Costs, Further Analysis** Reads in the correct files and does stuff here [Baseline vs. 10%-Lower-Trade-Cost Comparison, Baseline vs. Autarky Comparison, Sampson Calibration, and No GBM Firm Dynamics Calibration](SteadyState.ipynb)
+- **[Section 7.4 The Welfare Effects of a Reduction in Trade Costs, Further Analysis](section_7-4_more.ipynb)** jupyter (python) notebook which (i) performs calibration routines by calling MATLAB routines and (ii) computes welfare gains (by calling julia notebook [SteadyState.ipynb](SteadyState.ipynb)) for alternatives (ACR, Sampson, Atkenson and Burstein, No GBM).
 
-- **[Section 7.5. The Role of Firm Dynamics and Adoption Costs](section_7-5.ipynb)** jupyter notebook (i) which calls MATLAB code implement alternative calibration/computation for different GBM and delta shock parameter values and (ii) plots the results corresponding with Figure 6 and 7. **to Do add** reads in the correct parameter values and then runs the julia notebook here [Upsilon/Delta/Chi Welfare Decomposition](ChiUpsilonDelta.ipynb)
+- **[Section 7.5. The Role of Firm Dynamics and Adoption Costs](section_7-5.ipynb)** jupyter notebook (i) which calls MATLAB code implement alternative calibration/computation for different GBM and delta shock parameter values and (ii) plots the results corresponding with Figure 6 and 7.
 
 ---
 ### Installation and Use
