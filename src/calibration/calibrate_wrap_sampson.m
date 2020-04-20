@@ -94,7 +94,7 @@ params.d = new_cal(1);
 params.theta = new_cal(2);
 params.kappa = new_cal(3);
 params.chi = 1/new_cal(4);
-params.gamma = 1.0;
+%params.gamma = 1.0;
 params.dT = (new_cal(1)-1).*0.90 + 1;
 
 

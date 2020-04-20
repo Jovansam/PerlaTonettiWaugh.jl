@@ -8,7 +8,7 @@ function [zzz, welfare] = compute_growth_fun_cal(params)
 % command which selects ``selection_gbm_constant_Theta_functions`` which
 % are those equations which match up with what is in the paper appendix.
 
-stationary_s.g_guess = [.0005 0.02];
+stationary_s.g_guess = [0.025 0.005];
 stationary_s.z_hat_guess = [2]; 
 stationary_s.Omega_guess = [1];
     
