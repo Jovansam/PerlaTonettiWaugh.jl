@@ -30,7 +30,7 @@ The following notebooks compute all of the quantitative results and figures pres
 
 - **[Section 7.4 The Welfare Effects of a Reduction in Trade Costs, Further Analysis](section_7-4_more.ipynb)** jupyter (python) notebook which (i) performs calibration routines by calling MATLAB routines and (ii) computes welfare gains (by calling julia notebook [SteadyState.ipynb](SteadyState.ipynb)) for alternatives (ACR, Sampson, Atkenson and Burstein, No GBM).
 
-- **[Section 7.5. The Role of Firm Dynamics and Adoption Costs](section_7-5.ipynb)** jupyter notebook (i) which calls MATLAB code implement alternative calibration/computation for different GBM and delta shock parameter values and (ii) plots the results corresponding with Figure 6 and 7.
+- **[Section 7.5. The Role of Firm Dynamics and Adoption Costs](section_7-5.ipynb)** jupyter notebook (i) which calls MATLAB code to generate results for different GBM and delta shock parameter values and (ii) plots the results corresponding with Figure 6 and 7 of the paper.
 
 ---
 ### Installation and Use
