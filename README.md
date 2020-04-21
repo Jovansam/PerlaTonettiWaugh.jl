@@ -24,7 +24,7 @@ The following notebooks compute all of the quantitative results and figures pres
 
 - **[Section 7-2: Calibration Results](section_7-2.ipynb)** jupyter (python) notebook which calls the MATLAB code to implement the calibration procedure which finds parameter values such that moments in model best fit moments in data. Output is at [``/parameters/calibration_params.csv``](/parameters/calibration_params.csv) which contains the parameter values in the with headers for each column describing the associated parameter.
 
-- **Section 7.3 The Sources of the Welfare Gains from Trade—A Quantitative Decomposition** jupyter (julia) notebook run [Baseline Local Welfare Change Decomposition](WelfareChangeDecomposition.ipynb)
+- **[Section 7.3 The Sources of the Welfare Gains from Trade—A Quantitative Decomposition](section_7-3.ipynb)** jupyter (julia) notebook that performs the local welfare decomposition and results associated with the surrounding discussion in the paper. 
 
 - **[Section 7.4 The Welfare Effects of a Reduction in Trade Costs](section_7-4_main.ipynb)** jupyter (python) notebook which (i) calls julia notebook [TransitionDynamics.ipynb](TransitionDynamics.ipynb) and computes the transition dynamics of the economy and (ii) plots the results to match up with Figures 1-5 of paper.
 
