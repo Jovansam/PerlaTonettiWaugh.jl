@@ -63,7 +63,7 @@ The file ``calibration_wrap.m`` does the following:
 
 **3.** Given the calibration results, several things happen:
 
-- A file [``/parameters/calibration_params.csv``](/parameters/calibration_params.csv) is created with the calibrated parameters. 
+- A file [``/parameters/calibration_params.csv``](/parameters/calibration_params.csv) is created with the calibrated parameters.
 
 - An associated ``.mat`` file ``cal_params.mat`` is generated for use within matlab. The variable ``new_cal`` has the values in the in the following order: d, theta, kappa, 1/chi, mu, upsilon, sigma.
 
@@ -103,4 +103,4 @@ In the paper we have a set of figures (insert numbers) that reports how things c
 
 - **No Firm Dynamics** This code recalibrates the model with GBM are shut down. The code [``calibration_wrap_no_firm_dynamics.m``](calibration_wrap_no_firm_dynamics.m) performs the calibration. The underlying code and structure is exactly the same as in the main calibration code [``calibration_wrap.m``](calibration_wrap.m).
 
-  - [``/parameters/calibration_nofirmdyn.csv``](/parameters/calibration_nofirmdyn.csv) reports the resulting parameter values.
+  - [``/parameters/calibration_no_firm_dynamics.csv``](/parameters/calibration_no_firm_dynamics.csv) reports the resulting parameter values.
