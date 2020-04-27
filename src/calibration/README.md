@@ -53,7 +53,7 @@ The file ``calibration_wrap.m`` does the following:
 
   - [``eq_functions/calculate_equilibrium.m``](eq_functions/calculate_equilibrium.m) finds an equilibrium.
 
-  - [``eq_functions/selection_gbm_constant_Theta_functions.m``](eq_functions/selection_gbm_constant_Theta_functions.m) are the equilibrium functions which map to equations in the paper. **This is the one mathematica generated file**
+  - [``eq_functions/selection_gbm_constant_Theta_functions.m``](eq_functions/selection_gbm_constant_Theta_functions.m) are the equilibrium functions which map to equations in the paper.
 
   - [``static_firm_moments.m``](static_firm_moments.m) Computes the BEJK moments, fraction of exporters and then the relative size of domestic shipments for exporters vs non-exporters.
 
@@ -63,19 +63,11 @@ The file ``calibration_wrap.m`` does the following:
 
 **3.** Given the calibration results, several things happen:
 
-- A file [``output/main_results/calibration_params.csv``](output/main_results/calibration_params.csv) is created with the calibrated parameters. These are in the following order: d, theta, kappa, 1/chi, mu, upsilon, sigma, delta, rho.
+- A file [``/parameters/calibration_params.csv``](/parameters/calibration_params.csv) is created with the calibrated parameters. 
 
 - An associated ``.mat`` file ``cal_params.mat`` is generated for use within matlab. The variable ``new_cal`` has the values in the in the following order: d, theta, kappa, 1/chi, mu, upsilon, sigma.
 
 - Across steady state results are presented. To compute across steady state results the code [``compute_growth_fun_cal``](compute_growth_fun_cal.m) is called with the appropriately changed parameter values.
-
----
-
-#### <a name="plot_trans"></a> Plotting Transition Path Results
-
-This is all in [``transition_path_plots.ipynb``](transition_path_plots.ipynb)
-
-**Need to clean up**
 
 ---
 #### <a name="robust"></a> Main robustness calculations
@@ -97,18 +89,18 @@ In the paper we have a set of figures (insert numbers) that reports how things c
 
   - [``output/robust/gbm/norecalibrate_values_gbm_xx.mat``](output/robust/gbm/) where ``xx`` is the scale value for the given run. Each row shows the growth rate, counterfactual growth rate, difference, welfare gain, and the associated $\delta$.
 
-  - [``output/robust/gbm/closest_chi_params.csv``](output/robust/gbm/closest_chi_params.csv) report the parameter values which for a given $\chi$ result in a growth rate which is closest to the targeted growth rate of 0.79.
+  - [``/parameters/calibration_chi_XX.csv``](/parameters/) report the parameter values which for a given $\chi$ result in a growth rate which is closest to the targeted growth rate of 0.79.
 
 - **Robustness to changes in scaling parameter $\zeta$** This code is exactly the same as [``calibration_wrap.m``](calibration_wrap.m) with the only difference being that alternative $\zeta$s are fixed and loop over different calibrations is performed over the different $\zeta$s. The output is
 
-  - [``output/robust/zeta/calibration_zeta_xx.mat``](output/robust/zeta/) where ``xx`` is the scale value for the given run and each ``.mat`` files contains the parameter values in the following order: d, theta, kappa, 1/chi, mu, upsilon, sigma, delta, rho, zeta.
+  - [``/parameters/calibration_zeta_xx.csv``](/parameters/) where ``xx`` is the scale value for the given run and each ``.mat`` files contains the parameter values
 
 
 - **Comparison to Sampson (2016)** This code recalibrates the model targeting moments along the lines of Sampson (2016) and dynamics from GBM are shut down. The code [``calibration_wrap_sampson.m``](calibration_wrap_sampson.m) performs the calibration. The underlying code and structure is exactly the same as in the main calibration code [``calibration_wrap.m``](calibration_wrap.m).
 
-  - [``output/rellit/calibration_sampson.csv``](output/rellit/calibration_sampson.csv) reports the resulting parameter values in the following order:  d, theta, kappa, 1/chi, mu, upsilon, sigma, delta, rho.
+  - [``/parameters/calibration_sampson.csv``](/parameters/calibration_sampson.csv) reports the resulting parameter values
 
 
 - **No Firm Dynamics** This code recalibrates the model with GBM are shut down. The code [``calibration_wrap_no_firm_dynamics.m``](calibration_wrap_no_firm_dynamics.m) performs the calibration. The underlying code and structure is exactly the same as in the main calibration code [``calibration_wrap.m``](calibration_wrap.m).
 
-  - [``output/rellit/calibration_nofirmdyn.csv``](output/rellit/calibration_nofirmdyn.csv) reports the resulting parameter values in the following order:  d, theta, kappa, 1/chi, mu, upsilon, sigma, delta, rho.
+  - [``/parameters/calibration_nofirmdyn.csv``](/parameters/calibration_nofirmdyn.csv) reports the resulting parameter values.
