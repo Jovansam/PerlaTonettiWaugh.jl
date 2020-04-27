@@ -20,7 +20,7 @@ As in the derivation, the code has a "warmup" model without trade or monopolisti
 
 The following notebooks compute all of the quantitative results and figures presented in the paper. They are organized by Section in accordance with the NBER working paper version.
 
-- **[Section 7-1: Calibration](section_7-1.ipynb)** jupyter (python) notebook which direct pulls data and constructs moments for the calibration of the PTW model. Output are moments as ``.csv`` files which are then read in during the calibration routine.
+- **[Section 7-1: Calibration](section_7-1.ipynb)** jupyter (python) notebook which direct pulls data and constructs moments for the calibration of the PTW model. Output are moments as ``.csv`` files which are then read in during the calibration routine. **NOTE** the firm-level moments (transition probabilities and firm entry rate) are from the restricted access [SLBD](https://www.census.gov/programs-surveys/ces/data/public-use-data/synthetic-longitudinal-business-database.html). Instructions on how to access the SLBD and access our code is at [``/src/calibraiton/SLBD_instructions/SLBD_instructions.md``](/src/calibraiton/SLBD_instructions/SLBD_instructions.md).
 
 - **[Section 7-2: Calibration Results](section_7-2.ipynb)** jupyter (python) notebook which calls the MATLAB code to implement the calibration procedure which finds parameter values such that moments in model best fit moments in data. Output is at [``/parameters/calibration_params.csv``](/parameters/calibration_params.csv) which contains the parameter values in the with headers for each column describing the associated parameter.
 
