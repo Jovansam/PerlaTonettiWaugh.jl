@@ -104,3 +104,6 @@ In the paper we have a set of figures (insert numbers) that reports how things c
 - **No Firm Dynamics** This code recalibrates the model with GBM are shut down. The code [``calibration_wrap_no_firm_dynamics.m``](calibration_wrap_no_firm_dynamics.m) performs the calibration. The underlying code and structure is exactly the same as in the main calibration code [``calibration_wrap.m``](calibration_wrap.m).
 
   - [``/parameters/calibration_no_firm_dynamics.csv``](/parameters/calibration_no_firm_dynamics.csv) reports the resulting parameter values.
+
+
+- **Comparision to Atkeson and Burstein (2010)** The base of this code was downloaded from Ariel Burstein's website at: [http://www.econ.ucla.edu/arielb/innovcodes.zip](http://www.econ.ucla.edu/arielb/innovcodes.zip) With the code we set the discount rate, elasticity of substitution, the exit rate of firms, and the aggregate import share to be the same as in our calibration. The code is located in [``/calibration/ABmodel/Master_ptw.m``](/calibration/ABmodel/Master_ptw.m) runs the routine and returns the welfare gains from the same reduction in trade costs as in PTW, inclusive of the transition path.
