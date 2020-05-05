@@ -2,35 +2,35 @@
 
 ### Overview
 
-This repository has the complete code for the calibration, steady-state analysis, and transition dynamics of Perla, Tonetti, and Waugh [Equilibrium Technology Diffusion, Trade, and Growth](http://christophertonetti.com/files/papers/PerlaTonettiWaugh_DiffusionTradeAndGrowth.pdf)
+This repository contains the complete code used to calibrate the model and to compute equilibrium steady-state and transition dynamics of the model in Perla, Tonetti, and Waugh [Equilibrium Technology Diffusion, Trade, and Growth](http://christophertonetti.com/files/papers/PerlaTonettiWaugh_DiffusionTradeAndGrowth.pdf)
 
-The [derivation document](/docs/numerical_algorithm.pdf) has the complete set of equations implemented for the model, where all equation numbers in the code refer to this document.  General code and derivations for upwind finite difference methods are in the [SimpleDifferentialOperators.jl](https://github.com/QuantEcon/SimpleDifferentialOperators.jl) package with [detailed derivations](https://github.com/QuantEcon/SimpleDifferentialOperators.jl/releases/download/dev/discretized-differential-operator-derivation.pdf).
+The [derivation document](/docs/numerical_algorithm.pdf) has the complete set of equations defining the model. All equation numbers in the code refer to this document. General code and derivations for upwind finite difference methods are in the [SimpleDifferentialOperators.jl](https://github.com/QuantEcon/SimpleDifferentialOperators.jl) package with [detailed derivations](https://github.com/QuantEcon/SimpleDifferentialOperators.jl/releases/download/dev/discretized-differential-operator-derivation.pdf).
 
-As in the derivation, the code has a "warmup" model without trade or monopolistic competition to understand transition dynamics with this sort of growth model, and for experimenting with the DAE and finite-difference discretization methods.
+As in the derivation, the code has a "warmup" model without trade or monopolistic competition to help build an understanding of the transition dynamics in the full model in a related but simpler growth model. The warmup model is also helpful for experimenting with the DAE and finite-difference discretization methods.
 
 ---
 ### Directory of Code
 
-* **[/src/full](/src/full)** contains all of the code needed to compute the numerical results presented in the paper, given parameter values.
+* **[/src/full](/src/full)** contains all of the code used to compute the numerical results presented in the paper, given parameter values.
 
-* **[/src/calibration](/src/calibration)** Code to create moments and calibrate the model to match those moments. Parameter values are outputs. [Readme file](/src/calibration/README.md) describes this section of code in complete detail.
+* **[/src/calibration](/src/calibration)** contains all of the code used to create empirical moments and calibrate the model to match those moments. Parameter values are outputs. [Readme file](/src/calibration/README.md) describes this part of the code.
 
 ---
 ### Directory of Notebooks for Results in Paper
 
 The following notebooks compute all of the quantitative results and figures presented in the paper. They are organized by Section in accordance with the NBER working paper version.
 
-- **[Section 7-1: Calibration](section_7-1.ipynb)** jupyter (python) notebook which direct pulls data and constructs moments for the calibration of the PTW model. Output are moments as ``.csv`` files which are then read in during the calibration routine. **NOTE** the firm-level moments (transition probabilities and firm entry rate) are from the restricted access [SLBD](https://www.census.gov/programs-surveys/ces/data/public-use-data/synthetic-longitudinal-business-database.html). Instructions on how to access the SLBD and access our code is at [``/src/calibration/SLBD_instructions/SLBD_instructions.md``](/src/calibration/SLBD_instructions/SLBD_instructions.md).
+- **[Section 7-1: Calibration](section_7-1.ipynb)** jupyter (python) notebook which directly pulls data and constructs empirical moments for the calibration of the PTW model. The resulting output are moments saved as ``.csv`` files which are then imported into the simulated method of moments calibration routine. **NOTE** the firm-level moments (transition probabilities and firm entry rate) are from the restricted access [SLBD](https://www.census.gov/programs-surveys/ces/data/public-use-data/synthetic-longitudinal-business-database.html). Instructions on how to access the SLBD and access our code are at [``/src/calibration/SLBD_instructions/SLBD_instructions.md``](/src/calibration/SLBD_instructions/SLBD_instructions.md).
 
-- **[Section 7-2: Calibration Results](section_7-2.ipynb)** jupyter (python) notebook which calls the MATLAB code to implement the calibration procedure which finds parameter values such that moments in model best fit moments in data. Output is at [``/parameters/calibration_params.csv``](/parameters/calibration_params.csv) which contains the parameter values in the with headers for each column describing the associated parameter.
+- **[Section 7-2: Calibration Results](section_7-2.ipynb)** jupyter (python) notebook which calls the MATLAB code to implement the calibration procedure, which finds parameter values such that moments simulated from the model best fit moments in data. This procedure has parameter values as output, which are saved at [``/parameters/calibration_params.csv``](/parameters/calibration_params.csv). Headers for each column identify the parameter associated with each value.
 
-- **[Section 7.3 The Sources of the Welfare Gains from Trade—A Quantitative Decomposition](section_7-3.ipynb)** jupyter (julia) notebook that performs the local welfare decomposition and results associated with the surrounding discussion in the paper.
+- **[Section 7.3 The Sources of the Welfare Gains from Trade—A Quantitative Decomposition](section_7-3.ipynb)** jupyter (julia) notebook that performs the local welfare decomposition and associated results contined in the discussion surrounding the decomposition in the paper.
 
-- **[Section 7.4 The Welfare Effects of a Reduction in Trade Costs](section_7-4_main.ipynb)** jupyter (python) notebook which (i) calls julia notebook [TransitionDynamics.ipynb](TransitionDynamics.ipynb) and computes the transition dynamics of the economy and (ii) plots the results to match up with Figures 1-5 of paper.
+- **[Section 7.4 The Welfare Effects of a Reduction in Trade Costs](section_7-4_main.ipynb)** jupyter (python) notebook which (i) calls Julia notebook [TransitionDynamics.ipynb](TransitionDynamics.ipynb) and computes the transition dynamics of the economy and (ii) plots the results to match up with Figures 1-5 of the paper.
 
-- **[Section 7.4 The Welfare Effects of a Reduction in Trade Costs, Further Analysis](section_7-4_more.ipynb)** jupyter (python) notebook which (i) performs calibration routines by calling MATLAB routines and (ii) computes welfare gains (by calling julia notebook [SteadyState.ipynb](SteadyState.ipynb)) for alternatives (ACR, Sampson, Atkenson and Burstein, No GBM).
+- **[Section 7.4 The Welfare Effects of a Reduction in Trade Costs, Further Analysis](section_7-4_more.ipynb)** jupyter (python) notebook which (i) performs calibration routines by calling MATLAB routines and (ii) computes welfare gains (by calling julia notebook [SteadyState.ipynb](SteadyState.ipynb)) for alternatives to the baseline model (ACR, Sampson, Atkenson and Burstein, No GBM).
 
-- **[Section 7.5. The Role of Firm Dynamics and Adoption Costs](section_7-5.ipynb)** jupyter (python) notebook (i) which calls MATLAB code to generate results for different GBM and delta shock parameter values and (ii) plots the results corresponding with Figure 6 and 7 of the paper. Also computes results relative to the discussion in Section 7-3.
+- **[Section 7.5. The Role of Firm Dynamics and Adoption Costs](section_7-5.ipynb)** jupyter (python) notebook (i) which calls MATLAB code to generate results for different GBM and delta shock parameter values and (ii) plots the results corresponding with Figure 6 and 7 of the paper. Also computes results contained in the text of Section 7-3.
 
 ---
 ### Installation and Use
@@ -70,9 +70,9 @@ The following notebooks compute all of the quantitative results and figures pres
     cd(pkgdir(PerlaTonettiWaugh))
     ; jupyter lab
     ```
-    where the last step runs your `jupyter lab` in the shell. **The ; cannot be copy-and-pasted**; to access shell mode, you must type it manually (and you will see your prompt go red.)
+    where the last step runs your `jupyter lab` in the shell. **The ; cannot be copy-and-pasted**; to access shell mode, you must type it manually (and you will see your prompt go red).
 
-    **In either case, the first time the `using` it will be very slow**, as all dependencies need to be precompiled.
+    **In either case, the first time running the `using` command will be very slow**, as all dependencies need to be precompiled.
 
 4. In addition to the notebooks mentioned above, there is also the `simple_transition_dynamics.ipynb` notebook to solve the simple warm-up variation of the model (which does not appear in the paper) as described in the notes.
 
