@@ -30,7 +30,7 @@ function λ_ii(z_hat, parameters)
 end
 
 c(L_tilde, Ω, z_bar) = (1 - L_tilde)*z_bar # (C.15)
-function entry_residual(v_1, Ξ₁, parameters) # Would be nice to convert to use x instead of ζ directly.  Currently wrong for eta != 0
+function entry_residual(v_1, Ξ₁, parameters)
     @assert parameters.η ≈ 0.
     Ξ₁*v_1 - parameters.ζ*(1- parameters.χ)/parameters.χ # (56)
 end
