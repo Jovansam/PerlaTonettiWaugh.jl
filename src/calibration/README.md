@@ -3,7 +3,7 @@
 All in matlab or python with the associated jupyter notebooks.
 - [Create calibration moments](#calibration)
 - [Master calibration file](#master)
-- [Structure of main calibration file ``calibration_wrap``](#cal_func)
+- [Structure of main calibration file ``calibrate_wrap``](#cal_func)
 - [Robustness exercises](#robust)
 
 ---
@@ -31,11 +31,11 @@ The master file [``master_calibration.m``](master_calibration.m) produces all ca
 This file runs all other files, prints the results, and generates the appropriate output files used  as input when creating figures and numbers that appear in the paper.
 
 ---
-#### <a name="cal_func"></a> Structure of Main Calibration File [``calibration_wrap.m``](calibration_wrap.m)
+#### <a name="cal_func"></a> Structure of Main Calibration File [``calibrate_wrap.m``](calibrate_wrap.m)
 
-The file [``calibration_wrap.m``](calibration_wrap.m) calibrates the model using code that computes the BGP (balanced growth path) equilibrium. Transition dynamics are computed in Julia and described [here]().
+The file [``calibrate_wrap.m``](calibrate_wrap.m) calibrates the model using code that computes the BGP (balanced growth path) equilibrium. Transition dynamics are computed in Julia and described [here]().
 
-The file ``calibration_wrap.m`` does the following:
+The file ``calibrate_wrap.m`` does the following:
 
 **1.** Reads in the moments that are generated from the python notebook described above in [create calibration moments](#calibration)
 
@@ -90,17 +90,17 @@ In the paper Figures 6 and 7 display how changes to the GBM parameters $\mu$ and
 
   - [``/parameters/calibration_chi_xx.csv``](/parameters/), where ``xx`` is the value for $\chi$ at which the code is run. This file computes the parameter values which, for the given $\chi$, result in a growth rate which is closest to the targeted baseline growth rate of 0.79.
 
-- **Robustness to changes in scaling parameter $\zeta$** This code is exactly the same as [``calibration_wrap.m``](calibration_wrap.m) with the only difference being that alternative $\zeta$s are fixed and a loop over different calibrations is performed for the different $\zeta$s. The output is:
+- **Robustness to changes in scaling parameter $\zeta$** This code is exactly the same as [``calibrate_wrap.m``](calibrate_wrap.m) with the only difference being that alternative $\zeta$s are fixed and a loop over different calibrations is performed for the different $\zeta$s. The output is:
 
   - [``/parameters/calibration_zeta_xx.csv``](/parameters/) where ``xx`` is the $\zeta$ value for the given run and each ``.mat`` files contains the parameter values
 
 
-- **Comparison to Sampson (2016)** This code recalibrates the model to target moments related to Sampson (2016 QJE), in part by setting GBM parameters to zero. The code [``calibration_wrap_sampson.m``](calibration_wrap_sampson.m) performs the calibration. The underlying code and structure is exactly the same as in the main calibration code [``calibration_wrap.m``](calibration_wrap.m).
+- **Comparison to Sampson (2016)** This code recalibrates the model to target moments related to Sampson (2016 QJE), in part by setting GBM parameters to zero. The code [``calibrate_wrap_sampson.m``](calibrate_wrap_sampson.m) performs the calibration. The underlying code and structure is exactly the same as in the main calibration code [``calibrate_wrap.m``](calibrate_wrap.m).
 
   - [``/parameters/calibration_sampson.csv``](/parameters/calibration_sampson.csv) reports the resulting parameter values
 
 
-- **No Firm Dynamics** This code recalibrates the model with GBM parameters set to zero. The code [``calibration_wrap_no_firm_dynamics.m``](calibration_wrap_no_firm_dynamics.m) performs the calibration. The underlying code and structure is exactly the same as in the main calibration code [``calibration_wrap.m``](calibration_wrap.m).
+- **No Firm Dynamics** This code recalibrates the model with GBM parameters set to zero. The code [``calibrate_wrap_no_firm_dynamics.m``](calibrate_wrap_no_firm_dynamics.m) performs the calibration. The underlying code and structure is exactly the same as in the main calibration code [``calibrate_wrap.m``](calibrate_wrap.m).
 
   - [``/parameters/calibration_no_firm_dynamics.csv``](/parameters/calibration_no_firm_dynamics.csv) reports the resulting parameter values
 
