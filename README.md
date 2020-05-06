@@ -36,7 +36,9 @@ The following notebooks compute all of the quantitative results and figures pres
 ### Installation and Use
 
 1. Follow the instructions to [install Julia and Jupyter](https://lectures.quantecon.org/jl/getting_started.html)
-
+    1a. **Optional**: A [Python installation](https://www.anaconda.com/products/individual#Downloads) is required for most of the figures/   
+    1b. **Optional**: Re-running the calibration requires Matlab  
+    
 2. Open the Julia REPL (see the documentation above) and then install the package (by entering package mode with `]`) with
 
     ```julia
