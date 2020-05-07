@@ -26,10 +26,7 @@ export parameters_simple, settings_simple
 export parameter_defaults_tests, settings_defaults_tests
 export load_parameters
 export solve_simple_transition
-export stationary_algebraic, stationary_numerical, stationary_algebraic_simple, stationary_numerical_simple, steady_state_from_c, steady_state_from_g
-export stationary_algebraic_given_g_Ω, stationary_algebraic_given_all
-export steady_state_from_λ
-export stationary_algebraic_given_g
+export stationary_algebraic, stationary_numerical, stationary_algebraic_simple, stationary_numerical_simple, steady_state_from_g
 export ω_weights, solve_dynamics, welfare
 export compare_steady_states
 export solve_transition, prepare_results

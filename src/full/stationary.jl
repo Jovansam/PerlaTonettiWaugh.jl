@@ -89,47 +89,12 @@ function total_derivative(params_baseline, ϵ = 0.000001, settings = settings_de
 										g_extrap10p = g_extrap10p)
 end
 
-function steady_state_from_c(c_val, z_hat, Ω, parameters, settings)
-    @assert parameters.υ > 0 && parameters.κ > 0
-    sol = stationary_algebraic(parameters, settings)
-    @assert z_hat > 1 && Ω > 0 # input validation still required
-    g_sol = find_zero(x -> begin
-        vals = staticvals([x, z_hat, Ω], parameters)
-        return c(vals.L_tilde, Ω, vals.z_bar) - c_val
-    end, sol.g, Order2()) # error thrown if alg fails
-    staticvalues = staticvals([g_sol, z_hat, Ω], parameters)
-    return merge(staticvalues, merge((g = g_sol, z_hat = z_hat, Ω = Ω,), welfare([g_sol, z_hat, Ω], parameters)))
-end
-
 function steady_state_from_g(g, z_hat, Ω, parameters, settings)
     @assert parameters.υ > 0 && parameters.κ > 0
     @assert z_hat > 1 && Ω > 0 && g > 0 # input validation still required
     staticvalues = staticvals([g, z_hat, Ω], parameters)
     return merge(staticvalues, merge((g = g, z_hat = z_hat, Ω = Ω,), welfare([g, z_hat, Ω], parameters)))
 end
-
-function stationary_algebraic_given_g_Ω(g, Ω, parameters, settings)
-    x0 = settings.stationary_x0(parameters, settings)[2] # extract the z_hat
-    @assert parameters.υ > 0 && parameters.κ > 0
-    sol = nlsolve(x -> stationary_algebraic_aux([g, x..., Ω], parameters)[3], [x0], inplace = false) # x0 is 1-dimensional
-    converged(sol) || error("Solver didn't converge.")
-    z_hat = sol.zero[1]
-    @assert z_hat > 1
-    staticvalues = staticvals([g, z_hat, Ω], parameters) # uses undistorted parameters (except x)
-    return merge(staticvalues, merge((g = g, z_hat = z_hat, Ω = Ω,), welfare([g, z_hat, Ω], parameters))) # calculate quantities and return
-end
-
-function stationary_algebraic_given_g(g, parameters, settings)
-    x0 = settings.stationary_x0(parameters, settings)[[2, 3]] # extract the z_hat, Omega
-    @assert parameters.υ > 0 && parameters.κ > 0
-    sol = nlsolve(x -> stationary_algebraic_aux([g, x...], parameters)[[1, 3]], x0, inplace = false) # x0 is 2-dimensional
-    converged(sol) || error("Solver didn't converge.")
-    z_hat, Ω = sol.zero
-    @assert z_hat > 1 && Ω > 0
-    staticvalues = staticvals([g, z_hat, Ω], parameters)
-    return merge(staticvalues, merge((g = g, z_hat = z_hat, Ω = Ω,), welfare([g, z_hat, Ω], parameters))) # calculate quantities and return
-end
-
 
 function stationary_algebraic(parameters, settings)
     x0 = settings.stationary_x0(parameters, settings)
