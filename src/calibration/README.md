@@ -1,4 +1,4 @@
-### README for code associated with calibration, plotting of output, and robustness results of [Equilibrium Technology Diffusion, Trade, and Growth](https://christophertonetti.com/files/papers/PerlaTonettiWaugh_DiffusionTradeAndGrowth.pdf) by Perla, Tonetti, and Waugh (AER 2020)
+### README for code associated with calibration, plotting of output, and robustness results of [Equilibrium Technology Diffusion, Trade, and Growth](https://christophertonetti.com/files/papers/PerlaTonettiWaugh_DiffusionTradeAndGrowth.pdf) by Perla, Tonetti, and Waugh (AER 2020) 
 
 All in matlab or python with the associated jupyter notebooks.
 - [Create calibration moments](#calibration)
