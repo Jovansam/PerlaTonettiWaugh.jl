@@ -2,7 +2,7 @@
 
 ### Overview
 
-This repository contains the complete code used to calibrate the model and to compute equilibrium steady-state and transition dynamics of the model in Perla, Tonetti, and Waugh [Equilibrium Technology Diffusion, Trade, and Growth](https://christophertonetti.com/files/papers/PerlaTonettiWaugh_DiffusionTradeAndGrowth.pdf) (AER) paper.
+This repository contains the complete code used to calibrate the model and to compute equilibrium steady-state and transition dynamics of the model in [Equilibrium Technology Diffusion, Trade, and Growth](https://christophertonetti.com/files/papers/PerlaTonettiWaugh_DiffusionTradeAndGrowth.pdf) by Perla, Tonetti, and Waugh (AER 2020); OpenICPSR project number openicpsr-119393.
 
 The [derivation document](/docs/numerical_algorithm.pdf) has the complete set of equations defining the model. All equation numbers in the code refer to this document. General code and derivations for upwind finite difference methods are in the [SimpleDifferentialOperators.jl](https://github.com/QuantEcon/SimpleDifferentialOperators.jl) package with [detailed derivations](https://github.com/QuantEcon/SimpleDifferentialOperators.jl/releases/download/dev/discretized-differential-operator-derivation.pdf).
 
