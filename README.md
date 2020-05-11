@@ -35,7 +35,7 @@ The following notebooks compute all of the quantitative results and figures pres
 ---
 ### Installation and Use
 
-1. Follow the instructions to [install Julia and Jupyter](https://lectures.quantecon.org/jl/getting_started.html)
+1. Follow the instructions to [install Julia and Jupyter](https://julia.quantecon.org/getting_started_julia/getting_started.html)
 
     1a. **Optional**: A [Python installation](https://www.anaconda.com/products/individual#Downloads) is required for most of the figures.   
     
