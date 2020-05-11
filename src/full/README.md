@@ -1,4 +1,4 @@
-### README for code associated with solving the transition dynamics and steady state of AER Perla, Tonetti, and Waugh (2020)
+### README for code associated with solving the transition dynamics and steady state of of [Equilibrium Technology Diffusion, Trade, and Growth](https://christophertonetti.com/files/papers/PerlaTonettiWaugh_DiffusionTradeAndGrowth.pdf) by Perla, Tonetti, and Waugh (AER 2020)
 
 #### Julia Source
 

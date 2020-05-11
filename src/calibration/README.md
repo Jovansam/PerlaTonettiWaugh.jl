@@ -1,4 +1,4 @@
-### README for code associated with calibration, plotting of output, and robustness results of AER Perla, Tonetti, and Waugh (2020)
+### README for code associated with calibration, plotting of output, and robustness results of [Equilibrium Technology Diffusion, Trade, and Growth](https://christophertonetti.com/files/papers/PerlaTonettiWaugh_DiffusionTradeAndGrowth.pdf) by Perla, Tonetti, and Waugh (AER 2020)
 
 All in matlab or python with the associated jupyter notebooks.
 - [Create calibration moments](#calibration)
@@ -9,7 +9,7 @@ All in matlab or python with the associated jupyter notebooks.
 ---
 #### <a name="calibration"></a> Create Calibration Moments
 
-The notebook [``calibration_targets_results.ipynb``](calibration_targets_results.ipynb) pulls data and computes the empirical moments used in calibration. Most data in that notebook is pulled directly from online sources like FRED or the BLS. Some data is from the Synthetic Longitudinal Business Database. Data used in the paper was current from these sources as of May 5, 2020. [``calibration_targets_results.ipynb``](calibration_targets_results.ipynb) outputs the following ``.csv`` files to the ``data/`` folder, which are then used as inputs into the calibration code:
+The notebook [``../../section_7-1.ipynb``](section_7-1.ipynb) pulls data and computes the empirical moments used in calibration. Most data in that notebook is pulled directly from public online sources like FRED or the BLS. Some data is from the Synthetic Longitudinal Business Database. Data used in the paper was current from these sources as of April 5, 2020. The notebook [``../../section_7-1.ipynb``](section_7-1.ipynb) outputs the following ``.csv`` files to the ``src/calibration/data/`` folder, which are then used as inputs into the calibration code:
 
 - [``data/growth_and_r_moments.csv``](data/growth_and_r_moments.csv) are the measured productivity growth and real interest generate
 
