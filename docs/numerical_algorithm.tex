@@ -211,13 +211,6 @@ Transition dynamics can be solved for any exogenous $x(t)$ and $\pi(z,t)$ functi
 	\item Solve the system, which is at most a medium-sized problem for a serious DAE solver.
 \end{itemize}
 
-% \noindent To give a sense of the scale and speed in solving the DAE
-% \begin{itemize}
-% 	\item The simple model solves a system of about 100 ODEs and algebraic equations in less than $70\mu$s.  The number of nodes of $z$ is relatively low because the normalization of $v(z,t)$ leads to a fairly flat value function for most of the domain.
-% 	\item For the full model, we need about 1000 ODEs to capture extra curvature from the export decision, which is solved in a few seconds.  Most of the extra time is due to the complexity of static equilibrium conditions.  When we are solving the full model to gain further precision, we will sometimes add in extra time-steps which can increase the time to solve substantially, but this is generally not needed since--while sparse--the adaptive time-steps do a good job of capturing the dynamics of the model.
-% \end{itemize}
-
-
 This approach to solving transition dynamics seems to be generally applicable:\footnote{In fact, we suspect that this approach to be extremely fast and robust for most models.  Part of the difficulty in solving our setup is that models with endogenously determined growth rates have peculiarities which lead to extra sensitivity in numerical solutions.} (1) use a spatial discretization to turn the PDEs into a system of ODEs; (2) add any equilibrium constraints on the value functions or distributions as algebraic equations, using quadrature to convert any integrals into linear operators; (3) stack both to create a DAE system, and then use a high-performance solver.  A more general piece of advice for these is for economists to exploit high-performance ODE solvers with flexibility for various time-stepping methods rather than discretizing the time dimension on their own.
 
 \section{Full Growth Model with Transition Dynamics}
@@ -295,8 +288,6 @@ In practice, since the guess $\widehat{E}(0)$ is arbitrary and simply changes th
 \subsection{DAE for the Full Solution}\label{sec:full-ODE}
 The dynamic set of differential equations (rescaled) is derived in \cref{sec:full-model-derivations} and is very similar to the simple model.
 \begin{align}
-%	\tilde{\rho}(t) v(z,t) &= \pi(z,t) + (\mu - g(t) + (\sigma - 1)\upsilon^2)\D[z]v(z,t) + \frac{\upsilon^2}{2}\D[zz]v(z,t) + \D[t]v(z,t)\\
-%	\D[t]v(z,t) &= \left(\tilde{\rho}(t)  - (\mu - g(t) + (\sigma - 1)\upsilon^2)\D[z] - \frac{\upsilon^2}{2}\D[zz]\right)v(z,t) - \pi(z,t) \\
 	\D[t]v(z,t) &= A(t)v(z,t) - \pi(z,t) \\
 	A(t) &\equiv \tilde{\rho}(t)  - (\mu - g(t) + (\sigma - 1)\upsilon^2)\D[z] - \frac{\upsilon^2}{2}\D[zz]\\
 	v(0,t) &= \int_{0}^{\bar{z}}v(z,t) \frac{e^{\sigma - 1}F'(z)}{F(\bar{z})} \diff z - \zeta\\
@@ -636,16 +627,6 @@ To calculate the profitability ratio of the mean-to-min firm, take from PTW (24)
 	&= \notag \frac{\theta}{1 + \theta - \sigma} + (N-1)d^{1-\sigma}\frac{(\sigma-1)\hat{z}^{\sigma-1-\theta}}{1 + \theta - \sigma}
 \end{align}
 
-%\subsection{Summarizing Normalized Equations}\label{sec:normalized-equations}
-%Take as given $g(t),\pi_{\min}(t),\hat{z}(t), x(t)$, and $\tilde{r}(t)$(alternatively $g_w(t)$ and $r(t)$).  Then, the following equations must be fulfilled for all $t$ and  $z$
-%\begin{align}
-%\tilde{r}(t) \equiv & r(t) - g(t) - g_w(t)\label{eq:r-tilde-summary}\\
-%f(z) &= \theta e^{-\theta z}\label{eq:f-stationary-summary}\\
-%\tilde{r}(t) \hat{v}(z,t) &= \hat{\pi}(z,t) + (\mu - g(t))\D[z]\hat{v}(z,t) + \frac{\upsilon^2}{2}\D[zz]\hat{v}(z,t) + \D[t]\hat{v}(z,t)\label{eq:normalized-bellman-summary}\\
-%\D[z]\hat{v}(0,t) &= 0\label{eq:normalized-sp-summary}\\
-%\hat{v}(0,t) &= \int_{0}^{\infty}\hat{v}(z,t) f(z) \diff z - x(t)\label{eq:normalized-vm-summary}\\
-%\end{align}
-
 
 \subsection{Computation of equilibrium $\Omega(t)$ and $E(t)$}\label{sec:Omega-E}
 
@@ -773,8 +754,6 @@ U(t) &= \int_0^{\infty}e^{-\rho \tau}\log C(t+\tau)\diff \tau\\
 U(t) &= \int_0^{T-t}e^{-\rho \tau}\left(\log M(t+\tau)+\log c(t+\tau)\right)\diff \tau + \int_{T-t}^{\infty}e^{-\rho \tau}\left(\log M(t+\tau)+\log c(t+\tau)\right)\diff \tau\\
 \intertext{Note that $c(t)= \bar{c}$ for $t \geq T$,}
 &= \int_0^{T-t}e^{-\rho \tau}\left(\log M(t+\tau)+\log c(t+\tau)\right)\diff \tau + \frac{e^{-\rho( T-t)}}{\rho^2}\left(\bar{g} + \rho\left(\log \bar{c} + T \bar{g} \right) \right)\label{eq:U-dynamics}
-%	\intertext{With \cref{eq:M-t-sol}}
-%	&= \int_0^{T}e^{-\rho \tau}\left(\log M(t+\tau)+\log c(t+\tau)\right)\diff \tau + \frac{e^{-\rho( T-t)}}{\rho^2}\left((1+\rho( T-t))g(T) + \rho\left(\log \bar{c} + \log M(T) \right) \right)
 \intertext{With (PTW G.31) and (PTW G.33) and \cref{eq:f-stationary-summary}}
 c(t) &= \left(\frac{\theta}{1-\sigma+\theta}\right)^{\frac{1}{\sigma-1}}\left(1 - \tilde{L}(t)\right)\Omega(t)^{\frac{1}{\sigma - 1}} \lambda_{ii}(t)^{\frac{1}{1-\sigma}}\label{eq:c-def}
 \end{align}
