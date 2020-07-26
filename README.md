@@ -20,7 +20,7 @@ As in the derivation, the code has a "warmup" model without trade or monopolisti
 
 The following notebooks compute all of the quantitative results and figures presented in the paper. They are organized by Section in accordance with NBER working paper No. 20881 (April 2020 revision).
 
-- **[Section 7-1: Calibration—Compute Empirical Moments](section_7-1.ipynb)** jupyter (python) notebook which directly pulls data and constructs empirical moments for the calibration of the PTW model. The resulting output are moments saved as ``.csv`` files which are then imported into the simulated method of moments calibration routine. **NOTE** the firm-level moments (transition probabilities and firm entry rate) are from the restricted access [SLBD](https://www.census.gov/programs-surveys/ces/data/public-use-data/synthetic-longitudinal-business-database.html). Instructions on how to access the SLBD and access our code are at [``/src/calibration/SLBD_instructions/SLBD_instructions.md``](/src/calibration/SLBD_instructions/SLBD_instructions.md).
+- **[Section 7-1: Calibration—Compute Empirical Moments](section_7-1.ipynb)** jupyter (python) notebook which directly pulls data and constructs empirical moments for the calibration of the PTW model. The resulting output are moments saved as ``.csv`` files which are then imported into the simulated method of moments calibration routine. **NOTE** the firm-level moments (transition probabilities and firm entry rate) are from the restricted access [SynLBD](https://www.census.gov/programs-surveys/ces/data/public-use-data/synthetic-longitudinal-business-database.html). The Stata code that constructs the SynLBD-derived moments, the resulting output log files, and instructions on how to access the SynLBD are at [``/src/calibration/SynLBD/``](/src/calibration/SynLBD/).
 
 - **[Section 7-2: Calibration—SMM and Resulting Parameter Values](section_7-2.ipynb)** jupyter (python) notebook which calls the MATLAB code to implement the calibration procedure, which finds parameter values such that moments simulated from the model best fit moments in data. This procedure has parameter values as output, which are saved at [``/parameters/calibration_params.csv``](/parameters/calibration_params.csv). Headers for each column identify the parameter associated with each value.
 
@@ -40,6 +40,8 @@ The following notebooks compute all of the quantitative results and figures pres
     1a. **Optional**: A [Python installation](https://www.anaconda.com/products/individual#Downloads) is required for most of the figures.   
     
     1b. **Optional**: Re-running the calibration requires Matlab.
+	
+	1c. **Optional**: Computing the SynLBD-derived moments requires Stata.
     
 2. Open the Julia REPL (see the documentation above) and then install the package (by entering package mode with `]`) with
 
