@@ -9,7 +9,10 @@ All in matlab or python with the associated jupyter notebooks.
 ---
 #### <a name="calibration"></a> Create Calibration Moments
 
-The notebook [``../../section_7-1.ipynb``](section_7-1.ipynb) pulls data and computes the empirical moments used in calibration. Most data in that notebook is pulled directly from public online sources like FRED or the BLS. Some data is from the Synthetic Longitudinal Business Database. Data used in the paper was current from these sources as of April 5, 2020. The notebook [``../../section_7-1.ipynb``](section_7-1.ipynb) outputs the following ``.csv`` files to the ``src/calibration/data/`` folder, which are then used as inputs into the calibration code:
+The notebook [``../../section_7-1.ipynb``](section_7-1.ipynb) pulls data and computes the empirical moments used in calibration. Most data in that notebook is pulled directly from public online sources like FRED or the BLS. Some data is from the Synthetic Longitudinal Business Database. 
+* See **[/src/calibration/SynLBD(/src/calibration/SynLBD)** for the Stata code used to construct the SynLBD-derived moments, output log files, and instructions for how to access the SynLBD.
+
+Data used in the paper was current from these sources as of April 5, 2020. The notebook [``../../section_7-1.ipynb``](section_7-1.ipynb) outputs the following ``.csv`` files to the ``src/calibration/data/`` folder, which are then used as inputs into the calibration code:
 
 - [``data/growth_and_r_moments.csv``](data/growth_and_r_moments.csv) are the measured productivity growth and real interest generate
 
