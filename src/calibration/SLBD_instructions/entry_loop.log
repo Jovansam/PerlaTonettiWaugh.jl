@@ -1,0 +1,349 @@
+
+running /usr/local/stata14/profile.do ...
+
+
+. clear
+
+. *****************************************************************************
+> ***
+. set more off
+
+. 
+. *cd "/rdcprojects/tr/tr00612/programs/users/spec676/PTW_AER/"
+. local pwd : pwd
+
+. global rootdir "`pwd'"
+
+. cd $rootdir
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. 
+. save temp_entry, emptyok replace
+(note: dataset contains 0 observations)
+(note: file temp_entry.dta not found)
+file temp_entry.dta saved
+
+. * creates an empty .dta file which we will fill in...
+. 
+. cd "/rdcprojects/tr/tr00612/data/synlbd/2.0.2/"
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+
+. * where the files are located
+. 
+. clear
+
+. 
+. local files: dir "`c(pwd)'" files"*.dta"
+
+. *grab the lsit of the files in the directory
+. 
+. * Then the below commands will loop over each file, perform the computation, 
+> and 
+. * then append the results to the .dta file created above...
+. * This all works...
+. 
+. foreach file in `files'{
+  2.         di "`file'"
+  3.         use `file'
+  4.         
+.         *keep emp lastyear 
+.         * Take only employment and the last year
+.         
+.         keep if emp>19 & missing(emp)==0
+  5.         
+.         gen year = substr(`"`file'"',7,4)
+  6.         * This grabs the year from the file to record the year we are in. 
+.         
+.         destring(year), replace
+  7.         *Convert it too a float
+.         
+.         display year
+  8.         
+.         * Then the stuff below, compute all employment, then compute all the 
+> employment
+.         * based upon exit, and a size threshold.
+.         
+.         egen all_emp = sum(emp)
+  9.         
+.         egen entry = sum(emp) if firstyear == (year) 
+ 10.         
+.         * Manipulate this stuff
+.         
+.         collapse all_emp entry
+ 11. 
+.         keep all_emp entry
+ 12. 
+.         * Generate the ratios...
+.         
+.         gen entry_rate = entry/all_emp
+ 13.                 
+.         display entry_rate 
+ 14.         
+.         
+.         * Create the year again (some reason it gets lost)
+.         
+.         gen year = substr(`"`file'"',7,4)
+ 15.         
+.         keep entry_rate year
+ 16.         * This is the stuff we want
+.         
+.         *cd "/rdcprojects/tr/tr00612/programs/users/spec676/PTW_AER/"
+.         cd $rootdir
+ 17. 
+.         append using temp_entry.dta
+ 18.         * Append it to the .dta file
+.         
+.         save temp_entry.dta, replace
+ 19.         * Save the .dta file
+.         
+.         cd "/rdcprojects/tr/tr00612/data/synlbd/2.0.2/"
+ 20.         * Go back to the directory where we started
+.         * and do this over again
+.         
+.         clear
+ 21.         }
+synlbd1986c.dta
+(5,656,663 observations deleted)
+year: all characters numeric; replaced as int
+1986
+(751827 missing values generated)
+.01916915
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1987c.dta
+(5,868,384 observations deleted)
+year: all characters numeric; replaced as int
+1987
+(752453 missing values generated)
+.02831338
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1983c.dta
+(5,210,921 observations deleted)
+year: all characters numeric; replaced as int
+1983
+(638800 missing values generated)
+.02033567
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1988c.dta
+(5,816,338 observations deleted)
+year: all characters numeric; replaced as int
+1988
+(783218 missing values generated)
+.01921831
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1981c.dta
+(5,079,484 observations deleted)
+year: all characters numeric; replaced as int
+1981
+(639167 missing values generated)
+.01764809
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1982c.dta
+(5,174,488 observations deleted)
+year: all characters numeric; replaced as int
+1982
+(637235 missing values generated)
+.03147236
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1992c.dta
+(6,139,837 observations deleted)
+year: all characters numeric; replaced as int
+1992
+(825437 missing values generated)
+.02154902
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1977c.dta
+(4,874,727 observations deleted)
+year: all characters numeric; replaced as int
+1977
+(528683 missing values generated)
+.03376184
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1985c.dta
+(5,525,423 observations deleted)
+year: all characters numeric; replaced as int
+1985
+(718863 missing values generated)
+.01855242
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1999c.dta
+(6,604,297 observations deleted)
+year: all characters numeric; replaced as int
+1999
+(1006685 missing values generated)
+.02435768
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1984c.dta
+(5,355,653 observations deleted)
+year: all characters numeric; replaced as int
+1984
+(682530 missing values generated)
+.01924951
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1997c.dta
+(6,604,539 observations deleted)
+year: all characters numeric; replaced as int
+1997
+(953342 missing values generated)
+.02651773
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd2000c.dta
+(6,598,342 observations deleted)
+year: all characters numeric; replaced as int
+2000
+(1046669 missing values generated)
+.02389271
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1990c.dta
+(5,902,212 observations deleted)
+year: all characters numeric; replaced as int
+1990
+(845392 missing values generated)
+.02014592
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1998c.dta
+(6,588,816 observations deleted)
+year: all characters numeric; replaced as int
+1998
+(982899 missing values generated)
+.02266008
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1994c.dta
+(6,285,894 observations deleted)
+year: all characters numeric; replaced as int
+1994
+(872438 missing values generated)
+.02159485
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1989c.dta
+(5,921,252 observations deleted)
+year: all characters numeric; replaced as int
+1989
+(807882 missing values generated)
+.02906767
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1993c.dta
+(6,180,754 observations deleted)
+year: all characters numeric; replaced as int
+1993
+(847617 missing values generated)
+.01860368
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1995c.dta
+(6,379,159 observations deleted)
+year: all characters numeric; replaced as int
+1995
+(912407 missing values generated)
+.02112682
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1980c.dta
+(4,989,829 observations deleted)
+year: all characters numeric; replaced as int
+1980
+(639025 missing values generated)
+.01320152
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1979c.dta
+(4,938,791 observations deleted)
+year: all characters numeric; replaced as int
+1979
+(646505 missing values generated)
+.01497472
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1976c.dta
+(4,146,135 observations deleted)
+year: all characters numeric; replaced as int
+1976
+(487950 missing values generated)
+.05409877
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1996c.dta
+(6,487,333 observations deleted)
+year: all characters numeric; replaced as int
+1996
+(938050 missing values generated)
+.02544565
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1978c.dta
+(4,905,146 observations deleted)
+year: all characters numeric; replaced as int
+1978
+(600550 missing values generated)
+.01511667
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1991c.dta
+(6,059,783 observations deleted)
+year: all characters numeric; replaced as int
+1991
+(826139 missing values generated)
+.02857728
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file temp_entry.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+
+. *****************************************************************************
+> ***
+. * Report the output...  
+. *cd "/rdcprojects/tr/tr00612/programs/users/spec676/PTW_AER/"
+. cd $rootdir
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. 
+. use temp_entry.dta
+
+. 
+. sum entry_rate
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+  entry_rate |         25    .0235461    .0082177   .0132015   .0540988
+
+. 
+end of do-file

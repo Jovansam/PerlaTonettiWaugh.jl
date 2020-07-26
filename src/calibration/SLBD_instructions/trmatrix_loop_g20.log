@@ -1,0 +1,5809 @@
+
+running /usr/local/stata14/profile.do ...
+
+
+. clear
+
+. set more off
+
+. *****************************************************************************
+> ***
+. *cd "/home/spec676/"
+. *cd "/rdcprojects/tr/tr00612/programs/users/spec676/PTW_AER/"
+. local pwd : pwd
+
+. global rootdir "`pwd'"
+
+. cd $rootdir
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. 
+. 
+. save temp_trmatrix_g20, emptyok replace
+(note: dataset contains 0 observations)
+(note: file temp_trmatrix_g20.dta not found)
+file temp_trmatrix_g20.dta saved
+
+. * creates an empty .dta file which we will fill in...
+. 
+. cd "/rdcprojects/tr/tr00612/data/synlbd/2.0.2/"
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+
+. * where the files are located
+. 
+. clear
+
+. 
+. local files: dir "`c(pwd)'" files"*.dta"
+
+. *grab the lsit of the files in the directory
+. 
+. * Then the below commands will loop over each file, perform the computation, 
+> and 
+. * then append the results to the .dta file created above...
+. * This all works...
+. 
+. foreach file in `files'{
+  2.         di "`file'" 
+  3.         * Shows the file name we are using
+.         use `file'
+  4.         
+.         gen year = substr(`"`file'"',7,4)
+  5.         * This grabs the year from the file to record the year we are in. 
+.         
+.         destring(year), replace
+  6.         *Convert it too a float
+.         
+.         display year
+  7.         
+.         * Only do this for years before 1996...
+.         
+.         if year < 1996 {
+  8.         
+.         keep if emp > 19 & missing(emp) == 0
+  9.         *keep if emp > 1 & missing(emp)==0
+.         * This is the Hurst Pugsley cutoff, take out employment.
+.         *********************************************************************
+> ***
+.         * This is if we want to look only at manufacturing...
+.         
+.         *gen nsic3 = real(sic3)
+. 
+.         *keep if nsic3 >199 & nsic3 < 400
+.         
+.         
+.         *********************************************************************
+> ***
+.         sum emp,detail 
+ 10. 
+.         *********************************************************************
+> ***********
+.         * Now going to generate bins in the quantile, so the notation will be
+>  q1_y1 is 
+.         * bottom quintile in year 1 and so forth.
+.         
+.         *********************************************************************
+> ***
+.         * Figure out qurtiles...
+.         
+.         generate q1_y1=0 
+ 11.         replace q1_y1=1 if emp<=r(p25)
+ 12. 
+.         generate q2_y1=0
+ 13.         replace q2_y1=1 if r(p25)<emp & emp<=r(p50)
+ 14. 
+.         generate q3_y1=0 
+ 15.         replace q3_y1=1 if r(p50)<emp & emp<=r(p75)
+ 16. 
+.         generate q4_y1=0
+ 17.         replace q4_y1=1 if r(p75)<emp & emp<=r(max)
+ 18. 
+.         * Then keep only these values and save them...
+. 
+. *****************************************************************************
+> ***
+.         * Need to read in the new data set, this is a way to keep the name...
+.         * have to do this local stuff...
+.         local my_name = "synlbd"+ string((year+5))+"c.dta"
+ 19.         
+.         *di my_name
+.         
+.         keep lbdnum q1_y1 q2_y1 q3_y1 q4_y1
+ 20.         
+.         *cd "/rdcprojects/tr/tr00612/programs/users/spec676/PTW_AER/"
+.         cd $rootdir
+ 21. 
+.         save quantile_y1, replace
+ 22.         
+.         *********************************************************************
+> ***
+.         
+.         cd "/rdcprojects/tr/tr00612/data/synlbd/2.0.2/"
+ 23.         
+.         use `my_name', clear 
+ 24.         * my_name has to be like this "local" variable, took half a day to
+>  figure
+.         * this out.
+.         
+.         keep if emp > 19 & missing(emp)==0
+ 25.         *keep if emp > 1 & missing(emp)==0
+.         
+.         *********************************************************************
+> ***
+.         * This is if we want to look only at manufacturing...
+.         
+.         *gen nsic3 = real(sic3)
+. 
+.         *keep if nsic3 >199 & nsic3 < 400
+.         
+.         
+.         *********************************************************************
+> ***
+. 
+.         *sum emp,detail
+. 
+.         merge 1:1 lbdnum using $rootdir/quantile_y1.dta
+ 26.         keep if _merge==3
+ 27.         
+.         *cd "/rdcprojects/tr/tr00612/programs/users/spec676/PTW_AER/"
+.         cd $rootdir
+ 28. 
+.         do quartile_code.do
+ 29.         * In quartile code, it works through all the different transitions
+> ...
+. 
+.         gen year = substr(`"`file'"',7,4)
+ 30.         
+.         keep p11 p12 p13 p14 ///
+>         p21 p22 p23 p24 ///
+>         p31 p32 p33 p34 ///
+>         p41 p42 p43 p44 year
+ 31.         
+.         append using temp_trmatrix_g20.dta
+ 32.         * Append it to the .dta file
+.         
+.         save temp_trmatrix_g20.dta, replace
+ 33.         * Save the .dta file
+.         clear
+ 34.         }
+ 35.         
+.         clear
+ 36.         
+.         cd "/rdcprojects/tr/tr00612/data/synlbd/2.0.2/"
+ 37.         * Go back to the directory where we started
+.         * and do this over again
+. 
+. }
+synlbd1986c.dta
+year: all characters numeric; replaced as int
+1986
+(5,656,663 observations deleted)
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           21             20
+10%           22             20       Obs             770,632
+25%           26             20       Sum of Wgt.     770,632
+
+50%           38                      Mean           75.32149
+                        Largest       Std. Dev.      221.3012
+75%           69          22107
+90%          137          22429       Variance       48974.22
+95%          215          22581       Skewness       43.45338
+99%          583          29949       Kurtosis       3339.948
+(202,345 real changes made)
+(184,653 real changes made)
+(193,103 real changes made)
+(190,531 real changes made)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file quantile_y1.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+(6,059,783 observations deleted)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                       871,304
+        from master                   478,584  (_merge==1)
+        from using                    392,720  (_merge==2)
+
+    matched                           377,912  (_merge==3)
+    -----------------------------------------
+(871,304 observations deleted)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. *sum emp,detail
+. 
+. * Compute the same kind of statistics as above. 
+. set more off
+
+. 
+. sum emp,detail
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           22             20
+10%           24             20       Obs             377,912
+25%           31             20       Sum of Wgt.     377,912
+
+50%           50                      Mean           103.1719
+                        Largest       Std. Dev.       280.503
+75%           99          16765
+90%          189          16797       Variance       78681.91
+95%          300          22913       Skewness       24.55434
+99%          861          23009       Kurtosis       1035.637
+
+. 
+. * Compute the same kind of statistics as above. 
+. 
+. generate q1_y2=0 
+
+. replace q1_y2=1 if emp<=r(p25)
+(97,060 real changes made)
+
+. 
+. generate q2_y2=0
+
+. replace q2_y2=1 if r(p25)<emp & emp<=r(p50)
+(93,361 real changes made)
+
+. 
+. generate q3_y2=0 
+
+. replace q3_y2=1 if r(p50)<emp & emp<=r(p75)
+(93,778 real changes made)
+
+. 
+. generate q4_y2=0
+
+. replace q4_y2=1 if r(p75)<emp & emp<=r(max)
+(93,713 real changes made)
+
+. 
+. *****************************************************************************
+> ***
+. * Now create some new variables, q11 which is the variable if a q1 to q1 tran
+> sition
+. * occuerd.
+. 
+. generate q11=0 
+
+. replace q11=1 if q1_y1==1 & q1_y2==1
+(28,263 real changes made)
+
+. 
+. generate q12=0 
+
+. replace q12=1 if q1_y1==1 & q2_y2==1
+(19,969 real changes made)
+
+. 
+. generate q13=0 
+
+. replace q13=1 if q1_y1==1 & q3_y2==1
+(11,884 real changes made)
+
+. 
+. generate q14=0 
+
+. replace q14=1 if q1_y1==1 & q4_y2==1
+(4,234 real changes made)
+
+. 
+. generate q21=0 
+
+. replace q21=1 if q2_y1==1 & q1_y2==1
+(28,257 real changes made)
+
+. 
+. generate q22=0 
+
+. replace q22=1 if q2_y1==1 & q2_y2==1
+(24,736 real changes made)
+
+. 
+. generate q23=0 
+
+. replace q23=1 if q2_y1==1 & q3_y2==1
+(16,839 real changes made)
+
+. 
+. generate q24=0 
+
+. replace q24=1 if q2_y1==1 & q4_y2==1
+(6,971 real changes made)
+
+. 
+. generate q31=0 
+
+. replace q31=1 if q3_y1==1 & q1_y2==1
+(27,223 real changes made)
+
+. 
+. generate q32=0 
+
+. replace q32=1 if q3_y1==1 & q2_y2==1
+(29,788 real changes made)
+
+. 
+. generate q33=0 
+
+. replace q33=1 if q3_y1==1 & q3_y2==1
+(29,515 real changes made)
+
+. 
+. generate q34=0 
+
+. replace q34=1 if q3_y1==1 & q4_y2==1
+(16,682 real changes made)
+
+. 
+. generate q41=0 
+
+. replace q41=1 if q4_y1==1 & q1_y2==1
+(13,317 real changes made)
+
+. 
+. generate q42=0 
+
+. replace q42=1 if q4_y1==1 & q2_y2==1
+(18,868 real changes made)
+
+. 
+. generate q43=0 
+
+. replace q43=1 if q4_y1==1 & q3_y2==1
+(35,540 real changes made)
+
+. 
+. generate q44=0 
+
+. replace q44=1 if q4_y1==1 & q4_y2==1
+(65,826 real changes made)
+
+. 
+. egen sum_q1=sum(q1_y1)
+
+. egen sum_q2=sum(q2_y1)
+
+. egen sum_q3=sum(q3_y1)
+
+. egen sum_q4=sum(q4_y1)
+
+. 
+. egen sum_q11=sum(q11)
+
+. egen sum_q12=sum(q12)
+
+. egen sum_q13=sum(q13)
+
+. egen sum_q14=sum(q14)
+
+. egen sum_q21=sum(q21)
+
+. egen sum_q22=sum(q22)
+
+. egen sum_q23=sum(q23)
+
+. egen sum_q24=sum(q24)
+
+. egen sum_q31=sum(q31)
+
+. egen sum_q32=sum(q32)
+
+. egen sum_q33=sum(q33)
+
+. egen sum_q34=sum(q34)
+
+. egen sum_q41=sum(q41)
+
+. egen sum_q42=sum(q42)
+
+. egen sum_q43=sum(q43)
+
+. egen sum_q44=sum(q44)
+
+. 
+. collapse sum_q1 sum_q2 sum_q3 sum_q4 ///
+> sum_q11 sum_q12 sum_q13 sum_q14 ///
+> sum_q21 sum_q22 sum_q23 sum_q24 ///
+> sum_q31 sum_q32 sum_q33 sum_q34 ///
+> sum_q41 sum_q42 sum_q43 sum_q44
+
+. 
+. gen p11=sum_q11/sum_q1
+
+. gen p12=sum_q12/sum_q1
+
+. gen p13=sum_q13/sum_q1
+
+. gen p14=sum_q14/sum_q1
+
+. gen p21=sum_q21/sum_q2
+
+. gen p22=sum_q22/sum_q2
+
+. gen p23=sum_q23/sum_q2
+
+. gen p24=sum_q24/sum_q2
+
+. gen p31=sum_q31/sum_q3
+
+. gen p32=sum_q32/sum_q3
+
+. gen p33=sum_q33/sum_q3
+
+. gen p34=sum_q34/sum_q3
+
+. gen p41=sum_q41/sum_q4
+
+. gen p42=sum_q42/sum_q4
+
+. gen p43=sum_q43/sum_q4
+
+. gen p44=sum_q44/sum_q4
+
+. 
+. 
+end of do-file
+file temp_trmatrix_g20.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1987c.dta
+year: all characters numeric; replaced as int
+1987
+(5,868,384 observations deleted)
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           21             20
+10%           22             20       Obs             779,381
+25%           26             20       Sum of Wgt.     779,381
+
+50%           38                      Mean           75.25217
+                        Largest       Std. Dev.      208.0921
+75%           69          22954
+90%          136          22958       Variance        43302.3
+95%          215          22960       Skewness        38.6741
+99%          605          22960       Kurtosis       2882.757
+(206,143 real changes made)
+(187,428 real changes made)
+(193,800 real changes made)
+(192,010 real changes made)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file quantile_y1.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+(6,139,837 observations deleted)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                       855,007
+        from master                   462,036  (_merge==1)
+        from using                    392,971  (_merge==2)
+
+    matched                           386,410  (_merge==3)
+    -----------------------------------------
+(855,007 observations deleted)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. *sum emp,detail
+. 
+. * Compute the same kind of statistics as above. 
+. set more off
+
+. 
+. sum emp,detail
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           22             20
+10%           24             20       Obs             386,410
+25%           31             20       Sum of Wgt.     386,410
+
+50%           50                      Mean           104.0655
+                        Largest       Std. Dev.      282.2661
+75%           98          19234
+90%          190          19289       Variance       79674.18
+95%          306          21692       Skewness       23.61777
+99%          897          24062       Kurtosis       1002.462
+
+. 
+. * Compute the same kind of statistics as above. 
+. 
+. generate q1_y2=0 
+
+. replace q1_y2=1 if emp<=r(p25)
+(99,055 real changes made)
+
+. 
+. generate q2_y2=0
+
+. replace q2_y2=1 if r(p25)<emp & emp<=r(p50)
+(95,815 real changes made)
+
+. 
+. generate q3_y2=0 
+
+. replace q3_y2=1 if r(p50)<emp & emp<=r(p75)
+(95,508 real changes made)
+
+. 
+. generate q4_y2=0
+
+. replace q4_y2=1 if r(p75)<emp & emp<=r(max)
+(96,032 real changes made)
+
+. 
+. *****************************************************************************
+> ***
+. * Now create some new variables, q11 which is the variable if a q1 to q1 tran
+> sition
+. * occuerd.
+. 
+. generate q11=0 
+
+. replace q11=1 if q1_y1==1 & q1_y2==1
+(28,994 real changes made)
+
+. 
+. generate q12=0 
+
+. replace q12=1 if q1_y1==1 & q2_y2==1
+(20,807 real changes made)
+
+. 
+. generate q13=0 
+
+. replace q13=1 if q1_y1==1 & q3_y2==1
+(12,003 real changes made)
+
+. 
+. generate q14=0 
+
+. replace q14=1 if q1_y1==1 & q4_y2==1
+(4,273 real changes made)
+
+. 
+. generate q21=0 
+
+. replace q21=1 if q2_y1==1 & q1_y2==1
+(29,253 real changes made)
+
+. 
+. generate q22=0 
+
+. replace q22=1 if q2_y1==1 & q2_y2==1
+(25,380 real changes made)
+
+. 
+. generate q23=0 
+
+. replace q23=1 if q2_y1==1 & q3_y2==1
+(17,034 real changes made)
+
+. 
+. generate q24=0 
+
+. replace q24=1 if q2_y1==1 & q4_y2==1
+(6,851 real changes made)
+
+. 
+. generate q31=0 
+
+. replace q31=1 if q3_y1==1 & q1_y2==1
+(27,662 real changes made)
+
+. 
+. generate q32=0 
+
+. replace q32=1 if q3_y1==1 & q2_y2==1
+(30,621 real changes made)
+
+. 
+. generate q33=0 
+
+. replace q33=1 if q3_y1==1 & q3_y2==1
+(29,830 real changes made)
+
+. 
+. generate q34=0 
+
+. replace q34=1 if q3_y1==1 & q4_y2==1
+(17,015 real changes made)
+
+. 
+. generate q41=0 
+
+. replace q41=1 if q4_y1==1 & q1_y2==1
+(13,146 real changes made)
+
+. 
+. generate q42=0 
+
+. replace q42=1 if q4_y1==1 & q2_y2==1
+(19,007 real changes made)
+
+. 
+. generate q43=0 
+
+. replace q43=1 if q4_y1==1 & q3_y2==1
+(36,641 real changes made)
+
+. 
+. generate q44=0 
+
+. replace q44=1 if q4_y1==1 & q4_y2==1
+(67,893 real changes made)
+
+. 
+. egen sum_q1=sum(q1_y1)
+
+. egen sum_q2=sum(q2_y1)
+
+. egen sum_q3=sum(q3_y1)
+
+. egen sum_q4=sum(q4_y1)
+
+. 
+. egen sum_q11=sum(q11)
+
+. egen sum_q12=sum(q12)
+
+. egen sum_q13=sum(q13)
+
+. egen sum_q14=sum(q14)
+
+. egen sum_q21=sum(q21)
+
+. egen sum_q22=sum(q22)
+
+. egen sum_q23=sum(q23)
+
+. egen sum_q24=sum(q24)
+
+. egen sum_q31=sum(q31)
+
+. egen sum_q32=sum(q32)
+
+. egen sum_q33=sum(q33)
+
+. egen sum_q34=sum(q34)
+
+. egen sum_q41=sum(q41)
+
+. egen sum_q42=sum(q42)
+
+. egen sum_q43=sum(q43)
+
+. egen sum_q44=sum(q44)
+
+. 
+. collapse sum_q1 sum_q2 sum_q3 sum_q4 ///
+> sum_q11 sum_q12 sum_q13 sum_q14 ///
+> sum_q21 sum_q22 sum_q23 sum_q24 ///
+> sum_q31 sum_q32 sum_q33 sum_q34 ///
+> sum_q41 sum_q42 sum_q43 sum_q44
+
+. 
+. gen p11=sum_q11/sum_q1
+
+. gen p12=sum_q12/sum_q1
+
+. gen p13=sum_q13/sum_q1
+
+. gen p14=sum_q14/sum_q1
+
+. gen p21=sum_q21/sum_q2
+
+. gen p22=sum_q22/sum_q2
+
+. gen p23=sum_q23/sum_q2
+
+. gen p24=sum_q24/sum_q2
+
+. gen p31=sum_q31/sum_q3
+
+. gen p32=sum_q32/sum_q3
+
+. gen p33=sum_q33/sum_q3
+
+. gen p34=sum_q34/sum_q3
+
+. gen p41=sum_q41/sum_q4
+
+. gen p42=sum_q42/sum_q4
+
+. gen p43=sum_q43/sum_q4
+
+. gen p44=sum_q44/sum_q4
+
+. 
+. 
+end of do-file
+file temp_trmatrix_g20.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1983c.dta
+year: all characters numeric; replaced as int
+1983
+(5,210,921 observations deleted)
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           21             20
+10%           22             20       Obs             653,914
+25%           26             20       Sum of Wgt.     653,914
+
+50%           38                      Mean           76.96404
+                        Largest       Std. Dev.      250.5748
+75%           67          22395
+90%          136          22395       Variance       62787.74
+95%          219          24742       Skewness       41.52203
+99%          645          24750       Kurtosis       2697.751
+(174,756 real changes made)
+(160,102 real changes made)
+(155,857 real changes made)
+(163,199 real changes made)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file quantile_y1.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+(5,816,338 observations deleted)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                       797,332
+        from master                   472,170  (_merge==1)
+        from using                    325,162  (_merge==2)
+
+    matched                           328,752  (_merge==3)
+    -----------------------------------------
+(797,332 observations deleted)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. *sum emp,detail
+. 
+. * Compute the same kind of statistics as above. 
+. set more off
+
+. 
+. sum emp,detail
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           22             20
+10%           24             20       Obs             328,752
+25%           32             20       Sum of Wgt.     328,752
+
+50%           53                      Mean           109.3184
+                        Largest       Std. Dev.      297.1786
+75%          104          21613
+90%          204          22348       Variance       88315.11
+95%          325          23496       Skewness       27.40043
+99%          910          24026       Kurtosis       1329.845
+
+. 
+. * Compute the same kind of statistics as above. 
+. 
+. generate q1_y2=0 
+
+. replace q1_y2=1 if emp<=r(p25)
+(83,653 real changes made)
+
+. 
+. generate q2_y2=0
+
+. replace q2_y2=1 if r(p25)<emp & emp<=r(p50)
+(80,769 real changes made)
+
+. 
+. generate q3_y2=0 
+
+. replace q3_y2=1 if r(p50)<emp & emp<=r(p75)
+(82,218 real changes made)
+
+. 
+. generate q4_y2=0
+
+. replace q4_y2=1 if r(p75)<emp & emp<=r(max)
+(82,112 real changes made)
+
+. 
+. *****************************************************************************
+> ***
+. * Now create some new variables, q11 which is the variable if a q1 to q1 tran
+> sition
+. * occuerd.
+. 
+. generate q11=0 
+
+. replace q11=1 if q1_y1==1 & q1_y2==1
+(25,781 real changes made)
+
+. 
+. generate q12=0 
+
+. replace q12=1 if q1_y1==1 & q2_y2==1
+(18,269 real changes made)
+
+. 
+. generate q13=0 
+
+. replace q13=1 if q1_y1==1 & q3_y2==1
+(10,841 real changes made)
+
+. 
+. generate q14=0 
+
+. replace q14=1 if q1_y1==1 & q4_y2==1
+(4,084 real changes made)
+
+. 
+. generate q21=0 
+
+. replace q21=1 if q2_y1==1 & q1_y2==1
+(25,346 real changes made)
+
+. 
+. generate q22=0 
+
+. replace q22=1 if q2_y1==1 & q2_y2==1
+(22,343 real changes made)
+
+. 
+. generate q23=0 
+
+. replace q23=1 if q2_y1==1 & q3_y2==1
+(15,330 real changes made)
+
+. 
+. generate q24=0 
+
+. replace q24=1 if q2_y1==1 & q4_y2==1
+(6,682 real changes made)
+
+. 
+. generate q31=0 
+
+. replace q31=1 if q3_y1==1 & q1_y2==1
+(21,340 real changes made)
+
+. 
+. generate q32=0 
+
+. replace q32=1 if q3_y1==1 & q2_y2==1
+(23,958 real changes made)
+
+. 
+. generate q33=0 
+
+. replace q33=1 if q3_y1==1 & q3_y2==1
+(25,138 real changes made)
+
+. 
+. generate q34=0 
+
+. replace q34=1 if q3_y1==1 & q4_y2==1
+(14,594 real changes made)
+
+. 
+. generate q41=0 
+
+. replace q41=1 if q4_y1==1 & q1_y2==1
+(11,186 real changes made)
+
+. 
+. generate q42=0 
+
+. replace q42=1 if q4_y1==1 & q2_y2==1
+(16,199 real changes made)
+
+. 
+. generate q43=0 
+
+. replace q43=1 if q4_y1==1 & q3_y2==1
+(30,909 real changes made)
+
+. 
+. generate q44=0 
+
+. replace q44=1 if q4_y1==1 & q4_y2==1
+(56,752 real changes made)
+
+. 
+. egen sum_q1=sum(q1_y1)
+
+. egen sum_q2=sum(q2_y1)
+
+. egen sum_q3=sum(q3_y1)
+
+. egen sum_q4=sum(q4_y1)
+
+. 
+. egen sum_q11=sum(q11)
+
+. egen sum_q12=sum(q12)
+
+. egen sum_q13=sum(q13)
+
+. egen sum_q14=sum(q14)
+
+. egen sum_q21=sum(q21)
+
+. egen sum_q22=sum(q22)
+
+. egen sum_q23=sum(q23)
+
+. egen sum_q24=sum(q24)
+
+. egen sum_q31=sum(q31)
+
+. egen sum_q32=sum(q32)
+
+. egen sum_q33=sum(q33)
+
+. egen sum_q34=sum(q34)
+
+. egen sum_q41=sum(q41)
+
+. egen sum_q42=sum(q42)
+
+. egen sum_q43=sum(q43)
+
+. egen sum_q44=sum(q44)
+
+. 
+. collapse sum_q1 sum_q2 sum_q3 sum_q4 ///
+> sum_q11 sum_q12 sum_q13 sum_q14 ///
+> sum_q21 sum_q22 sum_q23 sum_q24 ///
+> sum_q31 sum_q32 sum_q33 sum_q34 ///
+> sum_q41 sum_q42 sum_q43 sum_q44
+
+. 
+. gen p11=sum_q11/sum_q1
+
+. gen p12=sum_q12/sum_q1
+
+. gen p13=sum_q13/sum_q1
+
+. gen p14=sum_q14/sum_q1
+
+. gen p21=sum_q21/sum_q2
+
+. gen p22=sum_q22/sum_q2
+
+. gen p23=sum_q23/sum_q2
+
+. gen p24=sum_q24/sum_q2
+
+. gen p31=sum_q31/sum_q3
+
+. gen p32=sum_q32/sum_q3
+
+. gen p33=sum_q33/sum_q3
+
+. gen p34=sum_q34/sum_q3
+
+. gen p41=sum_q41/sum_q4
+
+. gen p42=sum_q42/sum_q4
+
+. gen p43=sum_q43/sum_q4
+
+. gen p44=sum_q44/sum_q4
+
+. 
+. 
+end of do-file
+file temp_trmatrix_g20.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1988c.dta
+year: all characters numeric; replaced as int
+1988
+(5,816,338 observations deleted)
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           21             20
+10%           22             20       Obs             800,922
+25%           26             20       Sum of Wgt.     800,922
+
+50%           38                      Mean           75.34533
+                        Largest       Std. Dev.      214.9219
+75%           69          22348
+90%          135          23496       Variance       46191.42
+95%          214          24026       Skewness       36.28704
+99%          595          24365       Kurtosis       2407.256
+(213,262 real changes made)
+(194,214 real changes made)
+(196,601 real changes made)
+(196,845 real changes made)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file quantile_y1.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+(6,180,754 observations deleted)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                       860,480
+        from master                   463,093  (_merge==1)
+        from using                    397,387  (_merge==2)
+
+    matched                           403,535  (_merge==3)
+    -----------------------------------------
+(860,480 observations deleted)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. *sum emp,detail
+. 
+. * Compute the same kind of statistics as above. 
+. set more off
+
+. 
+. sum emp,detail
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           21             20
+10%           24             20       Obs             403,535
+25%           31             20       Sum of Wgt.     403,535
+
+50%           50                      Mean           103.3724
+                        Largest       Std. Dev.      276.7782
+75%           98          19889
+90%          189          19963       Variance       76606.19
+95%          302          20046       Skewness       23.64514
+99%          889          23637       Kurtosis       1015.483
+
+. 
+. * Compute the same kind of statistics as above. 
+. 
+. generate q1_y2=0 
+
+. replace q1_y2=1 if emp<=r(p25)
+(104,031 real changes made)
+
+. 
+. generate q2_y2=0
+
+. replace q2_y2=1 if r(p25)<emp & emp<=r(p50)
+(99,757 real changes made)
+
+. 
+. generate q3_y2=0 
+
+. replace q3_y2=1 if r(p50)<emp & emp<=r(p75)
+(99,491 real changes made)
+
+. 
+. generate q4_y2=0
+
+. replace q4_y2=1 if r(p75)<emp & emp<=r(max)
+(100,256 real changes made)
+
+. 
+. *****************************************************************************
+> ***
+. * Now create some new variables, q11 which is the variable if a q1 to q1 tran
+> sition
+. * occuerd.
+. 
+. generate q11=0 
+
+. replace q11=1 if q1_y1==1 & q1_y2==1
+(30,467 real changes made)
+
+. 
+. generate q12=0 
+
+. replace q12=1 if q1_y1==1 & q2_y2==1
+(21,535 real changes made)
+
+. 
+. generate q13=0 
+
+. replace q13=1 if q1_y1==1 & q3_y2==1
+(12,519 real changes made)
+
+. 
+. generate q14=0 
+
+. replace q14=1 if q1_y1==1 & q4_y2==1
+(4,332 real changes made)
+
+. 
+. generate q21=0 
+
+. replace q21=1 if q2_y1==1 & q1_y2==1
+(31,121 real changes made)
+
+. 
+. generate q22=0 
+
+. replace q22=1 if q2_y1==1 & q2_y2==1
+(27,169 real changes made)
+
+. 
+. generate q23=0 
+
+. replace q23=1 if q2_y1==1 & q3_y2==1
+(18,003 real changes made)
+
+. 
+. generate q24=0 
+
+. replace q24=1 if q2_y1==1 & q4_y2==1
+(7,181 real changes made)
+
+. 
+. generate q31=0 
+
+. replace q31=1 if q3_y1==1 & q1_y2==1
+(29,045 real changes made)
+
+. 
+. generate q32=0 
+
+. replace q32=1 if q3_y1==1 & q2_y2==1
+(31,407 real changes made)
+
+. 
+. generate q33=0 
+
+. replace q33=1 if q3_y1==1 & q3_y2==1
+(30,808 real changes made)
+
+. 
+. generate q34=0 
+
+. replace q34=1 if q3_y1==1 & q4_y2==1
+(17,416 real changes made)
+
+. 
+. generate q41=0 
+
+. replace q41=1 if q4_y1==1 & q1_y2==1
+(13,398 real changes made)
+
+. 
+. generate q42=0 
+
+. replace q42=1 if q4_y1==1 & q2_y2==1
+(19,646 real changes made)
+
+. 
+. generate q43=0 
+
+. replace q43=1 if q4_y1==1 & q3_y2==1
+(38,161 real changes made)
+
+. 
+. generate q44=0 
+
+. replace q44=1 if q4_y1==1 & q4_y2==1
+(71,327 real changes made)
+
+. 
+. egen sum_q1=sum(q1_y1)
+
+. egen sum_q2=sum(q2_y1)
+
+. egen sum_q3=sum(q3_y1)
+
+. egen sum_q4=sum(q4_y1)
+
+. 
+. egen sum_q11=sum(q11)
+
+. egen sum_q12=sum(q12)
+
+. egen sum_q13=sum(q13)
+
+. egen sum_q14=sum(q14)
+
+. egen sum_q21=sum(q21)
+
+. egen sum_q22=sum(q22)
+
+. egen sum_q23=sum(q23)
+
+. egen sum_q24=sum(q24)
+
+. egen sum_q31=sum(q31)
+
+. egen sum_q32=sum(q32)
+
+. egen sum_q33=sum(q33)
+
+. egen sum_q34=sum(q34)
+
+. egen sum_q41=sum(q41)
+
+. egen sum_q42=sum(q42)
+
+. egen sum_q43=sum(q43)
+
+. egen sum_q44=sum(q44)
+
+. 
+. collapse sum_q1 sum_q2 sum_q3 sum_q4 ///
+> sum_q11 sum_q12 sum_q13 sum_q14 ///
+> sum_q21 sum_q22 sum_q23 sum_q24 ///
+> sum_q31 sum_q32 sum_q33 sum_q34 ///
+> sum_q41 sum_q42 sum_q43 sum_q44
+
+. 
+. gen p11=sum_q11/sum_q1
+
+. gen p12=sum_q12/sum_q1
+
+. gen p13=sum_q13/sum_q1
+
+. gen p14=sum_q14/sum_q1
+
+. gen p21=sum_q21/sum_q2
+
+. gen p22=sum_q22/sum_q2
+
+. gen p23=sum_q23/sum_q2
+
+. gen p24=sum_q24/sum_q2
+
+. gen p31=sum_q31/sum_q3
+
+. gen p32=sum_q32/sum_q3
+
+. gen p33=sum_q33/sum_q3
+
+. gen p34=sum_q34/sum_q3
+
+. gen p41=sum_q41/sum_q4
+
+. gen p42=sum_q42/sum_q4
+
+. gen p43=sum_q43/sum_q4
+
+. gen p44=sum_q44/sum_q4
+
+. 
+. 
+end of do-file
+file temp_trmatrix_g20.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1981c.dta
+year: all characters numeric; replaced as int
+1981
+(5,079,484 observations deleted)
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           21             20
+10%           22             20       Obs             654,390
+25%           26             20       Sum of Wgt.     654,390
+
+50%           38                      Mean           78.91852
+                        Largest       Std. Dev.      260.3368
+75%           69          25039
+90%          141          28135       Variance       67775.27
+95%          228          28363       Skewness       43.19545
+99%          651          28566       Kurtosis       3070.639
+(174,579 real changes made)
+(159,680 real changes made)
+(157,259 real changes made)
+(162,872 real changes made)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file quantile_y1.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+(5,656,663 observations deleted)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                       764,758
+        from master                   440,500  (_merge==1)
+        from using                    324,258  (_merge==2)
+
+    matched                           330,132  (_merge==3)
+    -----------------------------------------
+(764,758 observations deleted)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. *sum emp,detail
+. 
+. * Compute the same kind of statistics as above. 
+. set more off
+
+. 
+. sum emp,detail
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           22             20
+10%           24             20       Obs             330,132
+25%           32             20       Sum of Wgt.     330,132
+
+50%           53                      Mean           108.5373
+                        Largest       Std. Dev.       315.479
+75%          103          22107
+90%          201          22429       Variance       99527.01
+95%          319          22581       Skewness       32.81158
+99%          926          29949       Kurtosis       1816.664
+
+. 
+. * Compute the same kind of statistics as above. 
+. 
+. generate q1_y2=0 
+
+. replace q1_y2=1 if emp<=r(p25)
+(84,426 real changes made)
+
+. 
+. generate q2_y2=0
+
+. replace q2_y2=1 if r(p25)<emp & emp<=r(p50)
+(82,274 real changes made)
+
+. 
+. generate q3_y2=0 
+
+. replace q3_y2=1 if r(p50)<emp & emp<=r(p75)
+(81,734 real changes made)
+
+. 
+. generate q4_y2=0
+
+. replace q4_y2=1 if r(p75)<emp & emp<=r(max)
+(81,698 real changes made)
+
+. 
+. *****************************************************************************
+> ***
+. * Now create some new variables, q11 which is the variable if a q1 to q1 tran
+> sition
+. * occuerd.
+. 
+. generate q11=0 
+
+. replace q11=1 if q1_y1==1 & q1_y2==1
+(26,013 real changes made)
+
+. 
+. generate q12=0 
+
+. replace q12=1 if q1_y1==1 & q2_y2==1
+(17,982 real changes made)
+
+. 
+. generate q13=0 
+
+. replace q13=1 if q1_y1==1 & q3_y2==1
+(10,293 real changes made)
+
+. 
+. generate q14=0 
+
+. replace q14=1 if q1_y1==1 & q4_y2==1
+(3,903 real changes made)
+
+. 
+. generate q21=0 
+
+. replace q21=1 if q2_y1==1 & q1_y2==1
+(25,433 real changes made)
+
+. 
+. generate q22=0 
+
+. replace q22=1 if q2_y1==1 & q2_y2==1
+(22,357 real changes made)
+
+. 
+. generate q23=0 
+
+. replace q23=1 if q2_y1==1 & q3_y2==1
+(15,137 real changes made)
+
+. 
+. generate q24=0 
+
+. replace q24=1 if q2_y1==1 & q4_y2==1
+(6,259 real changes made)
+
+. 
+. generate q31=0 
+
+. replace q31=1 if q3_y1==1 & q1_y2==1
+(22,277 real changes made)
+
+. 
+. generate q32=0 
+
+. replace q32=1 if q3_y1==1 & q2_y2==1
+(25,343 real changes made)
+
+. 
+. generate q33=0 
+
+. replace q33=1 if q3_y1==1 & q3_y2==1
+(25,337 real changes made)
+
+. 
+. generate q34=0 
+
+. replace q34=1 if q3_y1==1 & q4_y2==1
+(14,370 real changes made)
+
+. 
+. generate q41=0 
+
+. replace q41=1 if q4_y1==1 & q1_y2==1
+(10,703 real changes made)
+
+. 
+. generate q42=0 
+
+. replace q42=1 if q4_y1==1 & q2_y2==1
+(16,592 real changes made)
+
+. 
+. generate q43=0 
+
+. replace q43=1 if q4_y1==1 & q3_y2==1
+(30,967 real changes made)
+
+. 
+. generate q44=0 
+
+. replace q44=1 if q4_y1==1 & q4_y2==1
+(57,166 real changes made)
+
+. 
+. egen sum_q1=sum(q1_y1)
+
+. egen sum_q2=sum(q2_y1)
+
+. egen sum_q3=sum(q3_y1)
+
+. egen sum_q4=sum(q4_y1)
+
+. 
+. egen sum_q11=sum(q11)
+
+. egen sum_q12=sum(q12)
+
+. egen sum_q13=sum(q13)
+
+. egen sum_q14=sum(q14)
+
+. egen sum_q21=sum(q21)
+
+. egen sum_q22=sum(q22)
+
+. egen sum_q23=sum(q23)
+
+. egen sum_q24=sum(q24)
+
+. egen sum_q31=sum(q31)
+
+. egen sum_q32=sum(q32)
+
+. egen sum_q33=sum(q33)
+
+. egen sum_q34=sum(q34)
+
+. egen sum_q41=sum(q41)
+
+. egen sum_q42=sum(q42)
+
+. egen sum_q43=sum(q43)
+
+. egen sum_q44=sum(q44)
+
+. 
+. collapse sum_q1 sum_q2 sum_q3 sum_q4 ///
+> sum_q11 sum_q12 sum_q13 sum_q14 ///
+> sum_q21 sum_q22 sum_q23 sum_q24 ///
+> sum_q31 sum_q32 sum_q33 sum_q34 ///
+> sum_q41 sum_q42 sum_q43 sum_q44
+
+. 
+. gen p11=sum_q11/sum_q1
+
+. gen p12=sum_q12/sum_q1
+
+. gen p13=sum_q13/sum_q1
+
+. gen p14=sum_q14/sum_q1
+
+. gen p21=sum_q21/sum_q2
+
+. gen p22=sum_q22/sum_q2
+
+. gen p23=sum_q23/sum_q2
+
+. gen p24=sum_q24/sum_q2
+
+. gen p31=sum_q31/sum_q3
+
+. gen p32=sum_q32/sum_q3
+
+. gen p33=sum_q33/sum_q3
+
+. gen p34=sum_q34/sum_q3
+
+. gen p41=sum_q41/sum_q4
+
+. gen p42=sum_q42/sum_q4
+
+. gen p43=sum_q43/sum_q4
+
+. gen p44=sum_q44/sum_q4
+
+. 
+. 
+end of do-file
+file temp_trmatrix_g20.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1982c.dta
+year: all characters numeric; replaced as int
+1982
+(5,174,488 observations deleted)
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           21             20
+10%           22             20       Obs             662,463
+25%           26             20       Sum of Wgt.     662,463
+
+50%           38                      Mean           77.25794
+                        Largest       Std. Dev.      250.9321
+75%           68          28002
+90%          138          28510       Variance       62966.92
+95%          223          28564       Skewness       45.59494
+99%          633          29484       Kurtosis       3363.982
+(177,669 real changes made)
+(163,247 real changes made)
+(156,434 real changes made)
+(165,113 real changes made)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file quantile_y1.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+(5,868,384 observations deleted)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                       784,186
+        from master                   450,552  (_merge==1)
+        from using                    333,634  (_merge==2)
+
+    matched                           328,829  (_merge==3)
+    -----------------------------------------
+(784,186 observations deleted)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. *sum emp,detail
+. 
+. * Compute the same kind of statistics as above. 
+. set more off
+
+. 
+. sum emp,detail
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           22             20
+10%           24             20       Obs             328,829
+25%           32             20       Sum of Wgt.     328,829
+
+50%           53                      Mean           108.0434
+                        Largest       Std. Dev.      288.6107
+75%          103          22954
+90%          201          22958       Variance       83296.14
+95%          322          22960       Skewness       29.80221
+99%          908          22960       Kurtosis       1632.524
+
+. 
+. * Compute the same kind of statistics as above. 
+. 
+. generate q1_y2=0 
+
+. replace q1_y2=1 if emp<=r(p25)
+(84,160 real changes made)
+
+. 
+. generate q2_y2=0
+
+. replace q2_y2=1 if r(p25)<emp & emp<=r(p50)
+(80,767 real changes made)
+
+. 
+. generate q3_y2=0 
+
+. replace q3_y2=1 if r(p50)<emp & emp<=r(p75)
+(82,137 real changes made)
+
+. 
+. generate q4_y2=0
+
+. replace q4_y2=1 if r(p75)<emp & emp<=r(max)
+(81,765 real changes made)
+
+. 
+. *****************************************************************************
+> ***
+. * Now create some new variables, q11 which is the variable if a q1 to q1 tran
+> sition
+. * occuerd.
+. 
+. generate q11=0 
+
+. replace q11=1 if q1_y1==1 & q1_y2==1
+(26,145 real changes made)
+
+. 
+. generate q12=0 
+
+. replace q12=1 if q1_y1==1 & q2_y2==1
+(17,988 real changes made)
+
+. 
+. generate q13=0 
+
+. replace q13=1 if q1_y1==1 & q3_y2==1
+(10,643 real changes made)
+
+. 
+. generate q14=0 
+
+. replace q14=1 if q1_y1==1 & q4_y2==1
+(3,989 real changes made)
+
+. 
+. generate q21=0 
+
+. replace q21=1 if q2_y1==1 & q1_y2==1
+(25,896 real changes made)
+
+. 
+. generate q22=0 
+
+. replace q22=1 if q2_y1==1 & q2_y2==1
+(22,305 real changes made)
+
+. 
+. generate q23=0 
+
+. replace q23=1 if q2_y1==1 & q3_y2==1
+(15,565 real changes made)
+
+. 
+. generate q24=0 
+
+. replace q24=1 if q2_y1==1 & q4_y2==1
+(6,482 real changes made)
+
+. 
+. generate q31=0 
+
+. replace q31=1 if q3_y1==1 & q1_y2==1
+(21,456 real changes made)
+
+. 
+. generate q32=0 
+
+. replace q32=1 if q3_y1==1 & q2_y2==1
+(24,286 real changes made)
+
+. 
+. generate q33=0 
+
+. replace q33=1 if q3_y1==1 & q3_y2==1
+(25,388 real changes made)
+
+. 
+. generate q34=0 
+
+. replace q34=1 if q3_y1==1 & q4_y2==1
+(14,313 real changes made)
+
+. 
+. generate q41=0 
+
+. replace q41=1 if q4_y1==1 & q1_y2==1
+(10,663 real changes made)
+
+. 
+. generate q42=0 
+
+. replace q42=1 if q4_y1==1 & q2_y2==1
+(16,188 real changes made)
+
+. 
+. generate q43=0 
+
+. replace q43=1 if q4_y1==1 & q3_y2==1
+(30,541 real changes made)
+
+. 
+. generate q44=0 
+
+. replace q44=1 if q4_y1==1 & q4_y2==1
+(56,981 real changes made)
+
+. 
+. egen sum_q1=sum(q1_y1)
+
+. egen sum_q2=sum(q2_y1)
+
+. egen sum_q3=sum(q3_y1)
+
+. egen sum_q4=sum(q4_y1)
+
+. 
+. egen sum_q11=sum(q11)
+
+. egen sum_q12=sum(q12)
+
+. egen sum_q13=sum(q13)
+
+. egen sum_q14=sum(q14)
+
+. egen sum_q21=sum(q21)
+
+. egen sum_q22=sum(q22)
+
+. egen sum_q23=sum(q23)
+
+. egen sum_q24=sum(q24)
+
+. egen sum_q31=sum(q31)
+
+. egen sum_q32=sum(q32)
+
+. egen sum_q33=sum(q33)
+
+. egen sum_q34=sum(q34)
+
+. egen sum_q41=sum(q41)
+
+. egen sum_q42=sum(q42)
+
+. egen sum_q43=sum(q43)
+
+. egen sum_q44=sum(q44)
+
+. 
+. collapse sum_q1 sum_q2 sum_q3 sum_q4 ///
+> sum_q11 sum_q12 sum_q13 sum_q14 ///
+> sum_q21 sum_q22 sum_q23 sum_q24 ///
+> sum_q31 sum_q32 sum_q33 sum_q34 ///
+> sum_q41 sum_q42 sum_q43 sum_q44
+
+. 
+. gen p11=sum_q11/sum_q1
+
+. gen p12=sum_q12/sum_q1
+
+. gen p13=sum_q13/sum_q1
+
+. gen p14=sum_q14/sum_q1
+
+. gen p21=sum_q21/sum_q2
+
+. gen p22=sum_q22/sum_q2
+
+. gen p23=sum_q23/sum_q2
+
+. gen p24=sum_q24/sum_q2
+
+. gen p31=sum_q31/sum_q3
+
+. gen p32=sum_q32/sum_q3
+
+. gen p33=sum_q33/sum_q3
+
+. gen p34=sum_q34/sum_q3
+
+. gen p41=sum_q41/sum_q4
+
+. gen p42=sum_q42/sum_q4
+
+. gen p43=sum_q43/sum_q4
+
+. gen p44=sum_q44/sum_q4
+
+. 
+. 
+end of do-file
+file temp_trmatrix_g20.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1992c.dta
+year: all characters numeric; replaced as int
+1992
+(6,139,837 observations deleted)
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           21             20
+10%           22             20       Obs             848,446
+25%           26             20       Sum of Wgt.     848,446
+
+50%           37                      Mean           75.36615
+                        Largest       Std. Dev.      236.3506
+75%           67          19289
+90%          131          19858       Variance        55861.6
+95%          207          21692       Skewness       31.43761
+99%          590          24062       Kurtosis       1539.876
+(226,085 real changes made)
+(198,923 real changes made)
+(212,442 real changes made)
+(210,996 real changes made)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file quantile_y1.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+(6,604,539 observations deleted)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                       915,130
+        from master                   525,047  (_merge==1)
+        from using                    390,083  (_merge==2)
+
+    matched                           458,363  (_merge==3)
+    -----------------------------------------
+(915,130 observations deleted)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. *sum emp,detail
+. 
+. * Compute the same kind of statistics as above. 
+. set more off
+
+. 
+. sum emp,detail
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           22             20
+10%           24             20       Obs             458,363
+25%           32             20       Sum of Wgt.     458,363
+
+50%           51                      Mean            105.357
+                        Largest       Std. Dev.      310.0827
+75%          100          18301
+90%          191          22979       Variance       96151.29
+95%          307          25983       Skewness       26.84184
+99%          872          28063       Kurtosis        1165.68
+
+. 
+. * Compute the same kind of statistics as above. 
+. 
+. generate q1_y2=0 
+
+. replace q1_y2=1 if emp<=r(p25)
+(121,040 real changes made)
+
+. 
+. generate q2_y2=0
+
+. replace q2_y2=1 if r(p25)<emp & emp<=r(p50)
+(111,593 real changes made)
+
+. 
+. generate q3_y2=0 
+
+. replace q3_y2=1 if r(p50)<emp & emp<=r(p75)
+(112,073 real changes made)
+
+. 
+. generate q4_y2=0
+
+. replace q4_y2=1 if r(p75)<emp & emp<=r(max)
+(113,657 real changes made)
+
+. 
+. *****************************************************************************
+> ***
+. * Now create some new variables, q11 which is the variable if a q1 to q1 tran
+> sition
+. * occuerd.
+. 
+. generate q11=0 
+
+. replace q11=1 if q1_y1==1 & q1_y2==1
+(37,456 real changes made)
+
+. 
+. generate q12=0 
+
+. replace q12=1 if q1_y1==1 & q2_y2==1
+(24,696 real changes made)
+
+. 
+. generate q13=0 
+
+. replace q13=1 if q1_y1==1 & q3_y2==1
+(14,793 real changes made)
+
+. 
+. generate q14=0 
+
+. replace q14=1 if q1_y1==1 & q4_y2==1
+(4,934 real changes made)
+
+. 
+. generate q21=0 
+
+. replace q21=1 if q2_y1==1 & q1_y2==1
+(35,664 real changes made)
+
+. 
+. generate q22=0 
+
+. replace q22=1 if q2_y1==1 & q2_y2==1
+(30,767 real changes made)
+
+. 
+. generate q23=0 
+
+. replace q23=1 if q2_y1==1 & q3_y2==1
+(20,288 real changes made)
+
+. 
+. generate q24=0 
+
+. replace q24=1 if q2_y1==1 & q4_y2==1
+(7,949 real changes made)
+
+. 
+. generate q31=0 
+
+. replace q31=1 if q3_y1==1 & q1_y2==1
+(33,826 real changes made)
+
+. 
+. generate q32=0 
+
+. replace q32=1 if q3_y1==1 & q2_y2==1
+(36,294 real changes made)
+
+. 
+. generate q33=0 
+
+. replace q33=1 if q3_y1==1 & q3_y2==1
+(35,275 real changes made)
+
+. 
+. generate q34=0 
+
+. replace q34=1 if q3_y1==1 & q4_y2==1
+(19,988 real changes made)
+
+. 
+. generate q41=0 
+
+. replace q41=1 if q4_y1==1 & q1_y2==1
+(14,094 real changes made)
+
+. 
+. generate q42=0 
+
+. replace q42=1 if q4_y1==1 & q2_y2==1
+(19,836 real changes made)
+
+. 
+. generate q43=0 
+
+. replace q43=1 if q4_y1==1 & q3_y2==1
+(41,717 real changes made)
+
+. 
+. generate q44=0 
+
+. replace q44=1 if q4_y1==1 & q4_y2==1
+(80,786 real changes made)
+
+. 
+. egen sum_q1=sum(q1_y1)
+
+. egen sum_q2=sum(q2_y1)
+
+. egen sum_q3=sum(q3_y1)
+
+. egen sum_q4=sum(q4_y1)
+
+. 
+. egen sum_q11=sum(q11)
+
+. egen sum_q12=sum(q12)
+
+. egen sum_q13=sum(q13)
+
+. egen sum_q14=sum(q14)
+
+. egen sum_q21=sum(q21)
+
+. egen sum_q22=sum(q22)
+
+. egen sum_q23=sum(q23)
+
+. egen sum_q24=sum(q24)
+
+. egen sum_q31=sum(q31)
+
+. egen sum_q32=sum(q32)
+
+. egen sum_q33=sum(q33)
+
+. egen sum_q34=sum(q34)
+
+. egen sum_q41=sum(q41)
+
+. egen sum_q42=sum(q42)
+
+. egen sum_q43=sum(q43)
+
+. egen sum_q44=sum(q44)
+
+. 
+. collapse sum_q1 sum_q2 sum_q3 sum_q4 ///
+> sum_q11 sum_q12 sum_q13 sum_q14 ///
+> sum_q21 sum_q22 sum_q23 sum_q24 ///
+> sum_q31 sum_q32 sum_q33 sum_q34 ///
+> sum_q41 sum_q42 sum_q43 sum_q44
+
+. 
+. gen p11=sum_q11/sum_q1
+
+. gen p12=sum_q12/sum_q1
+
+. gen p13=sum_q13/sum_q1
+
+. gen p14=sum_q14/sum_q1
+
+. gen p21=sum_q21/sum_q2
+
+. gen p22=sum_q22/sum_q2
+
+. gen p23=sum_q23/sum_q2
+
+. gen p24=sum_q24/sum_q2
+
+. gen p31=sum_q31/sum_q3
+
+. gen p32=sum_q32/sum_q3
+
+. gen p33=sum_q33/sum_q3
+
+. gen p34=sum_q34/sum_q3
+
+. gen p41=sum_q41/sum_q4
+
+. gen p42=sum_q42/sum_q4
+
+. gen p43=sum_q43/sum_q4
+
+. gen p44=sum_q44/sum_q4
+
+. 
+. 
+end of do-file
+file temp_trmatrix_g20.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1977c.dta
+year: all characters numeric; replaced as int
+1977
+(4,874,727 observations deleted)
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           21             20
+10%           22             20       Obs             556,195
+25%           26             20       Sum of Wgt.     556,195
+
+50%           38                      Mean           85.06336
+                        Largest       Std. Dev.      311.8985
+75%           69          27729
+90%          147          27730       Variance        97280.7
+95%          248          27730       Skewness       39.44615
+99%          761          27730       Kurtosis       2458.489
+(146,555 real changes made)
+(135,067 real changes made)
+(135,745 real changes made)
+(138,828 real changes made)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file quantile_y1.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+(5,174,488 observations deleted)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                       657,958
+        from master                   382,113  (_merge==1)
+        from using                    275,845  (_merge==2)
+
+    matched                           280,350  (_merge==3)
+    -----------------------------------------
+(657,958 observations deleted)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. *sum emp,detail
+. 
+. * Compute the same kind of statistics as above. 
+. set more off
+
+. 
+. sum emp,detail
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           22             20
+10%           24             20       Obs             280,350
+25%           32             20       Sum of Wgt.     280,350
+
+50%           53                      Mean           115.9875
+                        Largest       Std. Dev.      359.1828
+75%          107          21117
+90%          216          28002       Variance       129012.3
+95%          353          28510       Skewness       31.63425
+99%         1026          28564       Kurtosis       1576.016
+
+. 
+. * Compute the same kind of statistics as above. 
+. 
+. generate q1_y2=0 
+
+. replace q1_y2=1 if emp<=r(p25)
+(72,250 real changes made)
+
+. 
+. generate q2_y2=0
+
+. replace q2_y2=1 if r(p25)<emp & emp<=r(p50)
+(68,179 real changes made)
+
+. 
+. generate q3_y2=0 
+
+. replace q3_y2=1 if r(p50)<emp & emp<=r(p75)
+(70,179 real changes made)
+
+. 
+. generate q4_y2=0
+
+. replace q4_y2=1 if r(p75)<emp & emp<=r(max)
+(69,742 real changes made)
+
+. 
+. *****************************************************************************
+> ***
+. * Now create some new variables, q11 which is the variable if a q1 to q1 tran
+> sition
+. * occuerd.
+. 
+. generate q11=0 
+
+. replace q11=1 if q1_y1==1 & q1_y2==1
+(21,826 real changes made)
+
+. 
+. generate q12=0 
+
+. replace q12=1 if q1_y1==1 & q2_y2==1
+(14,649 real changes made)
+
+. 
+. generate q13=0 
+
+. replace q13=1 if q1_y1==1 & q3_y2==1
+(8,507 real changes made)
+
+. 
+. generate q14=0 
+
+. replace q14=1 if q1_y1==1 & q4_y2==1
+(3,208 real changes made)
+
+. 
+. generate q21=0 
+
+. replace q21=1 if q2_y1==1 & q1_y2==1
+(21,722 real changes made)
+
+. 
+. generate q22=0 
+
+. replace q22=1 if q2_y1==1 & q2_y2==1
+(18,257 real changes made)
+
+. 
+. generate q23=0 
+
+. replace q23=1 if q2_y1==1 & q3_y2==1
+(12,913 real changes made)
+
+. 
+. generate q24=0 
+
+. replace q24=1 if q2_y1==1 & q4_y2==1
+(5,442 real changes made)
+
+. 
+. generate q31=0 
+
+. replace q31=1 if q3_y1==1 & q1_y2==1
+(19,456 real changes made)
+
+. 
+. generate q32=0 
+
+. replace q32=1 if q3_y1==1 & q2_y2==1
+(21,496 real changes made)
+
+. 
+. generate q33=0 
+
+. replace q33=1 if q3_y1==1 & q3_y2==1
+(21,331 real changes made)
+
+. 
+. generate q34=0 
+
+. replace q34=1 if q3_y1==1 & q4_y2==1
+(12,158 real changes made)
+
+. 
+. generate q41=0 
+
+. replace q41=1 if q4_y1==1 & q1_y2==1
+(9,246 real changes made)
+
+. 
+. generate q42=0 
+
+. replace q42=1 if q4_y1==1 & q2_y2==1
+(13,777 real changes made)
+
+. 
+. generate q43=0 
+
+. replace q43=1 if q4_y1==1 & q3_y2==1
+(27,428 real changes made)
+
+. 
+. generate q44=0 
+
+. replace q44=1 if q4_y1==1 & q4_y2==1
+(48,934 real changes made)
+
+. 
+. egen sum_q1=sum(q1_y1)
+
+. egen sum_q2=sum(q2_y1)
+
+. egen sum_q3=sum(q3_y1)
+
+. egen sum_q4=sum(q4_y1)
+
+. 
+. egen sum_q11=sum(q11)
+
+. egen sum_q12=sum(q12)
+
+. egen sum_q13=sum(q13)
+
+. egen sum_q14=sum(q14)
+
+. egen sum_q21=sum(q21)
+
+. egen sum_q22=sum(q22)
+
+. egen sum_q23=sum(q23)
+
+. egen sum_q24=sum(q24)
+
+. egen sum_q31=sum(q31)
+
+. egen sum_q32=sum(q32)
+
+. egen sum_q33=sum(q33)
+
+. egen sum_q34=sum(q34)
+
+. egen sum_q41=sum(q41)
+
+. egen sum_q42=sum(q42)
+
+. egen sum_q43=sum(q43)
+
+. egen sum_q44=sum(q44)
+
+. 
+. collapse sum_q1 sum_q2 sum_q3 sum_q4 ///
+> sum_q11 sum_q12 sum_q13 sum_q14 ///
+> sum_q21 sum_q22 sum_q23 sum_q24 ///
+> sum_q31 sum_q32 sum_q33 sum_q34 ///
+> sum_q41 sum_q42 sum_q43 sum_q44
+
+. 
+. gen p11=sum_q11/sum_q1
+
+. gen p12=sum_q12/sum_q1
+
+. gen p13=sum_q13/sum_q1
+
+. gen p14=sum_q14/sum_q1
+
+. gen p21=sum_q21/sum_q2
+
+. gen p22=sum_q22/sum_q2
+
+. gen p23=sum_q23/sum_q2
+
+. gen p24=sum_q24/sum_q2
+
+. gen p31=sum_q31/sum_q3
+
+. gen p32=sum_q32/sum_q3
+
+. gen p33=sum_q33/sum_q3
+
+. gen p34=sum_q34/sum_q3
+
+. gen p41=sum_q41/sum_q4
+
+. gen p42=sum_q42/sum_q4
+
+. gen p43=sum_q43/sum_q4
+
+. gen p44=sum_q44/sum_q4
+
+. 
+. 
+end of do-file
+file temp_trmatrix_g20.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1985c.dta
+year: all characters numeric; replaced as int
+1985
+(5,525,423 observations deleted)
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           21             20
+10%           22             20       Obs             734,711
+25%           26             20       Sum of Wgt.     734,711
+
+50%           38                      Mean           75.71112
+                        Largest       Std. Dev.      215.1448
+75%           69          18855
+90%          137          20776       Variance       46287.29
+95%          217          21608       Skewness       36.72852
+99%          608          21950       Kurtosis       2385.517
+(193,520 real changes made)
+(175,954 real changes made)
+(183,580 real changes made)
+(181,657 real changes made)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file quantile_y1.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+(5,902,212 observations deleted)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                       863,532
+        from master                   497,684  (_merge==1)
+        from using                    365,848  (_merge==2)
+
+    matched                           368,863  (_merge==3)
+    -----------------------------------------
+(863,532 observations deleted)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. *sum emp,detail
+. 
+. * Compute the same kind of statistics as above. 
+. set more off
+
+. 
+. sum emp,detail
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           22             20
+10%           24             20       Obs             368,863
+25%           32             20       Sum of Wgt.     368,863
+
+50%           52                      Mean           105.8589
+                        Largest       Std. Dev.      281.0101
+75%          102          16780
+90%          197          17306       Variance        78966.7
+95%          311          21606       Skewness       23.91426
+99%          879          25649       Kurtosis       1006.162
+
+. 
+. * Compute the same kind of statistics as above. 
+. 
+. generate q1_y2=0 
+
+. replace q1_y2=1 if emp<=r(p25)
+(97,881 real changes made)
+
+. 
+. generate q2_y2=0
+
+. replace q2_y2=1 if r(p25)<emp & emp<=r(p50)
+(89,327 real changes made)
+
+. 
+. generate q3_y2=0 
+
+. replace q3_y2=1 if r(p50)<emp & emp<=r(p75)
+(90,278 real changes made)
+
+. 
+. generate q4_y2=0
+
+. replace q4_y2=1 if r(p75)<emp & emp<=r(max)
+(91,377 real changes made)
+
+. 
+. *****************************************************************************
+> ***
+. * Now create some new variables, q11 which is the variable if a q1 to q1 tran
+> sition
+. * occuerd.
+. 
+. generate q11=0 
+
+. replace q11=1 if q1_y1==1 & q1_y2==1
+(28,965 real changes made)
+
+. 
+. generate q12=0 
+
+. replace q12=1 if q1_y1==1 & q2_y2==1
+(19,190 real changes made)
+
+. 
+. generate q13=0 
+
+. replace q13=1 if q1_y1==1 & q3_y2==1
+(11,393 real changes made)
+
+. 
+. generate q14=0 
+
+. replace q14=1 if q1_y1==1 & q4_y2==1
+(4,285 real changes made)
+
+. 
+. generate q21=0 
+
+. replace q21=1 if q2_y1==1 & q1_y2==1
+(28,543 real changes made)
+
+. 
+. generate q22=0 
+
+. replace q22=1 if q2_y1==1 & q2_y2==1
+(23,542 real changes made)
+
+. 
+. generate q23=0 
+
+. replace q23=1 if q2_y1==1 & q3_y2==1
+(16,257 real changes made)
+
+. 
+. generate q24=0 
+
+. replace q24=1 if q2_y1==1 & q4_y2==1
+(6,984 real changes made)
+
+. 
+. generate q31=0 
+
+. replace q31=1 if q3_y1==1 & q1_y2==1
+(27,459 real changes made)
+
+. 
+. generate q32=0 
+
+. replace q32=1 if q3_y1==1 & q2_y2==1
+(28,811 real changes made)
+
+. 
+. generate q33=0 
+
+. replace q33=1 if q3_y1==1 & q3_y2==1
+(28,195 real changes made)
+
+. 
+. generate q34=0 
+
+. replace q34=1 if q3_y1==1 & q4_y2==1
+(16,612 real changes made)
+
+. 
+. generate q41=0 
+
+. replace q41=1 if q4_y1==1 & q1_y2==1
+(12,914 real changes made)
+
+. 
+. generate q42=0 
+
+. replace q42=1 if q4_y1==1 & q2_y2==1
+(17,784 real changes made)
+
+. 
+. generate q43=0 
+
+. replace q43=1 if q4_y1==1 & q3_y2==1
+(34,433 real changes made)
+
+. 
+. generate q44=0 
+
+. replace q44=1 if q4_y1==1 & q4_y2==1
+(63,496 real changes made)
+
+. 
+. egen sum_q1=sum(q1_y1)
+
+. egen sum_q2=sum(q2_y1)
+
+. egen sum_q3=sum(q3_y1)
+
+. egen sum_q4=sum(q4_y1)
+
+. 
+. egen sum_q11=sum(q11)
+
+. egen sum_q12=sum(q12)
+
+. egen sum_q13=sum(q13)
+
+. egen sum_q14=sum(q14)
+
+. egen sum_q21=sum(q21)
+
+. egen sum_q22=sum(q22)
+
+. egen sum_q23=sum(q23)
+
+. egen sum_q24=sum(q24)
+
+. egen sum_q31=sum(q31)
+
+. egen sum_q32=sum(q32)
+
+. egen sum_q33=sum(q33)
+
+. egen sum_q34=sum(q34)
+
+. egen sum_q41=sum(q41)
+
+. egen sum_q42=sum(q42)
+
+. egen sum_q43=sum(q43)
+
+. egen sum_q44=sum(q44)
+
+. 
+. collapse sum_q1 sum_q2 sum_q3 sum_q4 ///
+> sum_q11 sum_q12 sum_q13 sum_q14 ///
+> sum_q21 sum_q22 sum_q23 sum_q24 ///
+> sum_q31 sum_q32 sum_q33 sum_q34 ///
+> sum_q41 sum_q42 sum_q43 sum_q44
+
+. 
+. gen p11=sum_q11/sum_q1
+
+. gen p12=sum_q12/sum_q1
+
+. gen p13=sum_q13/sum_q1
+
+. gen p14=sum_q14/sum_q1
+
+. gen p21=sum_q21/sum_q2
+
+. gen p22=sum_q22/sum_q2
+
+. gen p23=sum_q23/sum_q2
+
+. gen p24=sum_q24/sum_q2
+
+. gen p31=sum_q31/sum_q3
+
+. gen p32=sum_q32/sum_q3
+
+. gen p33=sum_q33/sum_q3
+
+. gen p34=sum_q34/sum_q3
+
+. gen p41=sum_q41/sum_q4
+
+. gen p42=sum_q42/sum_q4
+
+. gen p43=sum_q43/sum_q4
+
+. gen p44=sum_q44/sum_q4
+
+. 
+. 
+end of do-file
+file temp_trmatrix_g20.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1999c.dta
+year: all characters numeric; replaced as int
+1999
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1984c.dta
+year: all characters numeric; replaced as int
+1984
+(5,355,653 observations deleted)
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           21             20
+10%           22             20       Obs             697,571
+25%           26             20       Sum of Wgt.     697,571
+
+50%           38                      Mean           76.36429
+                        Largest       Std. Dev.      229.9127
+75%           68          20052
+90%          138          20052       Variance       52859.84
+95%          221          20052       Skewness       38.59545
+99%          617          20052       Kurtosis       2467.109
+(183,748 real changes made)
+(171,100 real changes made)
+(170,007 real changes made)
+(172,716 real changes made)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file quantile_y1.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+(5,921,252 observations deleted)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                       837,247
+        from master                   487,734  (_merge==1)
+        from using                    349,513  (_merge==2)
+
+    matched                           348,058  (_merge==3)
+    -----------------------------------------
+(837,247 observations deleted)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. *sum emp,detail
+. 
+. * Compute the same kind of statistics as above. 
+. set more off
+
+. 
+. sum emp,detail
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           22             20
+10%           24             20       Obs             348,058
+25%           32             20       Sum of Wgt.     348,058
+
+50%           53                      Mean           108.0168
+                        Largest       Std. Dev.       286.065
+75%          103          19068
+90%          201          19088       Variance       81833.17
+95%          321          23556       Skewness       24.53913
+99%          893          23566       Kurtosis       1078.734
+
+. 
+. * Compute the same kind of statistics as above. 
+. 
+. generate q1_y2=0 
+
+. replace q1_y2=1 if emp<=r(p25)
+(90,168 real changes made)
+
+. 
+. generate q2_y2=0
+
+. replace q2_y2=1 if r(p25)<emp & emp<=r(p50)
+(86,018 real changes made)
+
+. 
+. generate q3_y2=0 
+
+. replace q3_y2=1 if r(p50)<emp & emp<=r(p75)
+(84,924 real changes made)
+
+. 
+. generate q4_y2=0
+
+. replace q4_y2=1 if r(p75)<emp & emp<=r(max)
+(86,948 real changes made)
+
+. 
+. *****************************************************************************
+> ***
+. * Now create some new variables, q11 which is the variable if a q1 to q1 tran
+> sition
+. * occuerd.
+. 
+. generate q11=0 
+
+. replace q11=1 if q1_y1==1 & q1_y2==1
+(26,798 real changes made)
+
+. 
+. generate q12=0 
+
+. replace q12=1 if q1_y1==1 & q2_y2==1
+(18,917 real changes made)
+
+. 
+. generate q13=0 
+
+. replace q13=1 if q1_y1==1 & q3_y2==1
+(10,620 real changes made)
+
+. 
+. generate q14=0 
+
+. replace q14=1 if q1_y1==1 & q4_y2==1
+(4,103 real changes made)
+
+. 
+. generate q21=0 
+
+. replace q21=1 if q2_y1==1 & q1_y2==1
+(27,449 real changes made)
+
+. 
+. generate q22=0 
+
+. replace q22=1 if q2_y1==1 & q2_y2==1
+(23,526 real changes made)
+
+. 
+. generate q23=0 
+
+. replace q23=1 if q2_y1==1 & q3_y2==1
+(15,856 real changes made)
+
+. 
+. generate q24=0 
+
+. replace q24=1 if q2_y1==1 & q4_y2==1
+(6,884 real changes made)
+
+. 
+. generate q31=0 
+
+. replace q31=1 if q3_y1==1 & q1_y2==1
+(24,160 real changes made)
+
+. 
+. generate q32=0 
+
+. replace q32=1 if q3_y1==1 & q2_y2==1
+(26,661 real changes made)
+
+. 
+. generate q33=0 
+
+. replace q33=1 if q3_y1==1 & q3_y2==1
+(26,033 real changes made)
+
+. 
+. generate q34=0 
+
+. replace q34=1 if q3_y1==1 & q4_y2==1
+(15,650 real changes made)
+
+. 
+. generate q41=0 
+
+. replace q41=1 if q4_y1==1 & q1_y2==1
+(11,761 real changes made)
+
+. 
+. generate q42=0 
+
+. replace q42=1 if q4_y1==1 & q2_y2==1
+(16,914 real changes made)
+
+. 
+. generate q43=0 
+
+. replace q43=1 if q4_y1==1 & q3_y2==1
+(32,415 real changes made)
+
+. 
+. generate q44=0 
+
+. replace q44=1 if q4_y1==1 & q4_y2==1
+(60,311 real changes made)
+
+. 
+. egen sum_q1=sum(q1_y1)
+
+. egen sum_q2=sum(q2_y1)
+
+. egen sum_q3=sum(q3_y1)
+
+. egen sum_q4=sum(q4_y1)
+
+. 
+. egen sum_q11=sum(q11)
+
+. egen sum_q12=sum(q12)
+
+. egen sum_q13=sum(q13)
+
+. egen sum_q14=sum(q14)
+
+. egen sum_q21=sum(q21)
+
+. egen sum_q22=sum(q22)
+
+. egen sum_q23=sum(q23)
+
+. egen sum_q24=sum(q24)
+
+. egen sum_q31=sum(q31)
+
+. egen sum_q32=sum(q32)
+
+. egen sum_q33=sum(q33)
+
+. egen sum_q34=sum(q34)
+
+. egen sum_q41=sum(q41)
+
+. egen sum_q42=sum(q42)
+
+. egen sum_q43=sum(q43)
+
+. egen sum_q44=sum(q44)
+
+. 
+. collapse sum_q1 sum_q2 sum_q3 sum_q4 ///
+> sum_q11 sum_q12 sum_q13 sum_q14 ///
+> sum_q21 sum_q22 sum_q23 sum_q24 ///
+> sum_q31 sum_q32 sum_q33 sum_q34 ///
+> sum_q41 sum_q42 sum_q43 sum_q44
+
+. 
+. gen p11=sum_q11/sum_q1
+
+. gen p12=sum_q12/sum_q1
+
+. gen p13=sum_q13/sum_q1
+
+. gen p14=sum_q14/sum_q1
+
+. gen p21=sum_q21/sum_q2
+
+. gen p22=sum_q22/sum_q2
+
+. gen p23=sum_q23/sum_q2
+
+. gen p24=sum_q24/sum_q2
+
+. gen p31=sum_q31/sum_q3
+
+. gen p32=sum_q32/sum_q3
+
+. gen p33=sum_q33/sum_q3
+
+. gen p34=sum_q34/sum_q3
+
+. gen p41=sum_q41/sum_q4
+
+. gen p42=sum_q42/sum_q4
+
+. gen p43=sum_q43/sum_q4
+
+. gen p44=sum_q44/sum_q4
+
+. 
+. 
+end of do-file
+file temp_trmatrix_g20.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1997c.dta
+year: all characters numeric; replaced as int
+1997
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd2000c.dta
+year: all characters numeric; replaced as int
+2000
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1990c.dta
+year: all characters numeric; replaced as int
+1990
+(5,902,212 observations deleted)
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           21             20
+10%           22             20       Obs             866,547
+25%           26             20       Sum of Wgt.     866,547
+
+50%           38                      Mean           74.25559
+                        Largest       Std. Dev.      204.3584
+75%           68          17306
+90%          133          21606       Variance       41762.34
+95%          210          23032       Skewness       32.41462
+99%          586          25649       Kurtosis       1941.908
+(229,995 real changes made)
+(214,877 real changes made)
+(207,584 real changes made)
+(214,091 real changes made)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file quantile_y1.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+(6,379,159 observations deleted)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                       901,810
+        from master                   485,744  (_merge==1)
+        from using                    416,066  (_merge==2)
+
+    matched                           450,481  (_merge==3)
+    -----------------------------------------
+(901,810 observations deleted)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. *sum emp,detail
+. 
+. * Compute the same kind of statistics as above. 
+. set more off
+
+. 
+. sum emp,detail
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           22             20
+10%           24             20       Obs             450,481
+25%           31             20       Sum of Wgt.     450,481
+
+50%           50                      Mean           102.6104
+                        Largest       Std. Dev.      283.1642
+75%           98          16903
+90%          187          17822       Variance       80181.98
+95%          298          18436       Skewness       23.57387
+99%          853          24245       Kurtosis       916.6042
+
+. 
+. * Compute the same kind of statistics as above. 
+. 
+. generate q1_y2=0 
+
+. replace q1_y2=1 if emp<=r(p25)
+(115,147 real changes made)
+
+. 
+. generate q2_y2=0
+
+. replace q2_y2=1 if r(p25)<emp & emp<=r(p50)
+(114,018 real changes made)
+
+. 
+. generate q3_y2=0 
+
+. replace q3_y2=1 if r(p50)<emp & emp<=r(p75)
+(110,049 real changes made)
+
+. 
+. generate q4_y2=0
+
+. replace q4_y2=1 if r(p75)<emp & emp<=r(max)
+(111,267 real changes made)
+
+. 
+. *****************************************************************************
+> ***
+. * Now create some new variables, q11 which is the variable if a q1 to q1 tran
+> sition
+. * occuerd.
+. 
+. generate q11=0 
+
+. replace q11=1 if q1_y1==1 & q1_y2==1
+(34,570 real changes made)
+
+. 
+. generate q12=0 
+
+. replace q12=1 if q1_y1==1 & q2_y2==1
+(25,021 real changes made)
+
+. 
+. generate q13=0 
+
+. replace q13=1 if q1_y1==1 & q3_y2==1
+(13,811 real changes made)
+
+. 
+. generate q14=0 
+
+. replace q14=1 if q1_y1==1 & q4_y2==1
+(4,623 real changes made)
+
+. 
+. generate q21=0 
+
+. replace q21=1 if q2_y1==1 & q1_y2==1
+(35,638 real changes made)
+
+. 
+. generate q22=0 
+
+. replace q22=1 if q2_y1==1 & q2_y2==1
+(32,447 real changes made)
+
+. 
+. generate q23=0 
+
+. replace q23=1 if q2_y1==1 & q3_y2==1
+(20,483 real changes made)
+
+. 
+. generate q24=0 
+
+. replace q24=1 if q2_y1==1 & q4_y2==1
+(8,085 real changes made)
+
+. 
+. generate q31=0 
+
+. replace q31=1 if q3_y1==1 & q1_y2==1
+(31,075 real changes made)
+
+. 
+. generate q32=0 
+
+. replace q32=1 if q3_y1==1 & q2_y2==1
+(35,568 real changes made)
+
+. 
+. generate q33=0 
+
+. replace q33=1 if q3_y1==1 & q3_y2==1
+(33,702 real changes made)
+
+. 
+. generate q34=0 
+
+. replace q34=1 if q3_y1==1 & q4_y2==1
+(18,485 real changes made)
+
+. 
+. generate q41=0 
+
+. replace q41=1 if q4_y1==1 & q1_y2==1
+(13,864 real changes made)
+
+. 
+. generate q42=0 
+
+. replace q42=1 if q4_y1==1 & q2_y2==1
+(20,982 real changes made)
+
+. 
+. generate q43=0 
+
+. replace q43=1 if q4_y1==1 & q3_y2==1
+(42,053 real changes made)
+
+. 
+. generate q44=0 
+
+. replace q44=1 if q4_y1==1 & q4_y2==1
+(80,074 real changes made)
+
+. 
+. egen sum_q1=sum(q1_y1)
+
+. egen sum_q2=sum(q2_y1)
+
+. egen sum_q3=sum(q3_y1)
+
+. egen sum_q4=sum(q4_y1)
+
+. 
+. egen sum_q11=sum(q11)
+
+. egen sum_q12=sum(q12)
+
+. egen sum_q13=sum(q13)
+
+. egen sum_q14=sum(q14)
+
+. egen sum_q21=sum(q21)
+
+. egen sum_q22=sum(q22)
+
+. egen sum_q23=sum(q23)
+
+. egen sum_q24=sum(q24)
+
+. egen sum_q31=sum(q31)
+
+. egen sum_q32=sum(q32)
+
+. egen sum_q33=sum(q33)
+
+. egen sum_q34=sum(q34)
+
+. egen sum_q41=sum(q41)
+
+. egen sum_q42=sum(q42)
+
+. egen sum_q43=sum(q43)
+
+. egen sum_q44=sum(q44)
+
+. 
+. collapse sum_q1 sum_q2 sum_q3 sum_q4 ///
+> sum_q11 sum_q12 sum_q13 sum_q14 ///
+> sum_q21 sum_q22 sum_q23 sum_q24 ///
+> sum_q31 sum_q32 sum_q33 sum_q34 ///
+> sum_q41 sum_q42 sum_q43 sum_q44
+
+. 
+. gen p11=sum_q11/sum_q1
+
+. gen p12=sum_q12/sum_q1
+
+. gen p13=sum_q13/sum_q1
+
+. gen p14=sum_q14/sum_q1
+
+. gen p21=sum_q21/sum_q2
+
+. gen p22=sum_q22/sum_q2
+
+. gen p23=sum_q23/sum_q2
+
+. gen p24=sum_q24/sum_q2
+
+. gen p31=sum_q31/sum_q3
+
+. gen p32=sum_q32/sum_q3
+
+. gen p33=sum_q33/sum_q3
+
+. gen p34=sum_q34/sum_q3
+
+. gen p41=sum_q41/sum_q4
+
+. gen p42=sum_q42/sum_q4
+
+. gen p43=sum_q43/sum_q4
+
+. gen p44=sum_q44/sum_q4
+
+. 
+. 
+end of do-file
+file temp_trmatrix_g20.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1998c.dta
+year: all characters numeric; replaced as int
+1998
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1994c.dta
+year: all characters numeric; replaced as int
+1994
+(6,285,894 observations deleted)
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           21             20
+10%           22             20       Obs             895,523
+25%           26             20       Sum of Wgt.     895,523
+
+50%           38                      Mean           73.75487
+                        Largest       Std. Dev.      201.0995
+75%           67          17024
+90%          132          17029       Variance       40440.99
+95%          207          17238       Skewness       29.89708
+99%          573          23464       Kurtosis       1589.885
+(237,908 real changes made)
+(222,892 real changes made)
+(210,952 real changes made)
+(223,771 real changes made)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file quantile_y1.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+(6,604,297 observations deleted)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                       966,828
+        from master                   553,374  (_merge==1)
+        from using                    413,454  (_merge==2)
+
+    matched                           482,069  (_merge==3)
+    -----------------------------------------
+(966,828 observations deleted)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. *sum emp,detail
+. 
+. * Compute the same kind of statistics as above. 
+. set more off
+
+. 
+. sum emp,detail
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           22             20
+10%           24             20       Obs             482,069
+25%           32             20       Sum of Wgt.     482,069
+
+50%           51                      Mean           104.6145
+                        Largest       Std. Dev.      302.7523
+75%           99          17441
+90%          189          20652       Variance       91658.95
+95%          301          24255       Skewness       24.45601
+99%          852          26923       Kurtosis       964.4678
+
+. 
+. * Compute the same kind of statistics as above. 
+. 
+. generate q1_y2=0 
+
+. replace q1_y2=1 if emp<=r(p25)
+(128,229 real changes made)
+
+. 
+. generate q2_y2=0
+
+. replace q2_y2=1 if r(p25)<emp & emp<=r(p50)
+(116,553 real changes made)
+
+. 
+. generate q3_y2=0 
+
+. replace q3_y2=1 if r(p50)<emp & emp<=r(p75)
+(117,559 real changes made)
+
+. 
+. generate q4_y2=0
+
+. replace q4_y2=1 if r(p75)<emp & emp<=r(max)
+(119,728 real changes made)
+
+. 
+. *****************************************************************************
+> ***
+. * Now create some new variables, q11 which is the variable if a q1 to q1 tran
+> sition
+. * occuerd.
+. 
+. generate q11=0 
+
+. replace q11=1 if q1_y1==1 & q1_y2==1
+(39,155 real changes made)
+
+. 
+. generate q12=0 
+
+. replace q12=1 if q1_y1==1 & q2_y2==1
+(25,586 real changes made)
+
+. 
+. generate q13=0 
+
+. replace q13=1 if q1_y1==1 & q3_y2==1
+(15,321 real changes made)
+
+. 
+. generate q14=0 
+
+. replace q14=1 if q1_y1==1 & q4_y2==1
+(5,675 real changes made)
+
+. 
+. generate q21=0 
+
+. replace q21=1 if q2_y1==1 & q1_y2==1
+(39,995 real changes made)
+
+. 
+. generate q22=0 
+
+. replace q22=1 if q2_y1==1 & q2_y2==1
+(33,313 real changes made)
+
+. 
+. generate q23=0 
+
+. replace q23=1 if q2_y1==1 & q3_y2==1
+(23,133 real changes made)
+
+. 
+. generate q24=0 
+
+. replace q24=1 if q2_y1==1 & q4_y2==1
+(9,034 real changes made)
+
+. 
+. generate q31=0 
+
+. replace q31=1 if q3_y1==1 & q1_y2==1
+(33,369 real changes made)
+
+. 
+. generate q32=0 
+
+. replace q32=1 if q3_y1==1 & q2_y2==1
+(36,375 real changes made)
+
+. 
+. generate q33=0 
+
+. replace q33=1 if q3_y1==1 & q3_y2==1
+(34,990 real changes made)
+
+. 
+. generate q34=0 
+
+. replace q34=1 if q3_y1==1 & q4_y2==1
+(19,911 real changes made)
+
+. 
+. generate q41=0 
+
+. replace q41=1 if q4_y1==1 & q1_y2==1
+(15,710 real changes made)
+
+. 
+. generate q42=0 
+
+. replace q42=1 if q4_y1==1 & q2_y2==1
+(21,279 real changes made)
+
+. 
+. generate q43=0 
+
+. replace q43=1 if q4_y1==1 & q3_y2==1
+(44,115 real changes made)
+
+. 
+. generate q44=0 
+
+. replace q44=1 if q4_y1==1 & q4_y2==1
+(85,108 real changes made)
+
+. 
+. egen sum_q1=sum(q1_y1)
+
+. egen sum_q2=sum(q2_y1)
+
+. egen sum_q3=sum(q3_y1)
+
+. egen sum_q4=sum(q4_y1)
+
+. 
+. egen sum_q11=sum(q11)
+
+. egen sum_q12=sum(q12)
+
+. egen sum_q13=sum(q13)
+
+. egen sum_q14=sum(q14)
+
+. egen sum_q21=sum(q21)
+
+. egen sum_q22=sum(q22)
+
+. egen sum_q23=sum(q23)
+
+. egen sum_q24=sum(q24)
+
+. egen sum_q31=sum(q31)
+
+. egen sum_q32=sum(q32)
+
+. egen sum_q33=sum(q33)
+
+. egen sum_q34=sum(q34)
+
+. egen sum_q41=sum(q41)
+
+. egen sum_q42=sum(q42)
+
+. egen sum_q43=sum(q43)
+
+. egen sum_q44=sum(q44)
+
+. 
+. collapse sum_q1 sum_q2 sum_q3 sum_q4 ///
+> sum_q11 sum_q12 sum_q13 sum_q14 ///
+> sum_q21 sum_q22 sum_q23 sum_q24 ///
+> sum_q31 sum_q32 sum_q33 sum_q34 ///
+> sum_q41 sum_q42 sum_q43 sum_q44
+
+. 
+. gen p11=sum_q11/sum_q1
+
+. gen p12=sum_q12/sum_q1
+
+. gen p13=sum_q13/sum_q1
+
+. gen p14=sum_q14/sum_q1
+
+. gen p21=sum_q21/sum_q2
+
+. gen p22=sum_q22/sum_q2
+
+. gen p23=sum_q23/sum_q2
+
+. gen p24=sum_q24/sum_q2
+
+. gen p31=sum_q31/sum_q3
+
+. gen p32=sum_q32/sum_q3
+
+. gen p33=sum_q33/sum_q3
+
+. gen p34=sum_q34/sum_q3
+
+. gen p41=sum_q41/sum_q4
+
+. gen p42=sum_q42/sum_q4
+
+. gen p43=sum_q43/sum_q4
+
+. gen p44=sum_q44/sum_q4
+
+. 
+. 
+end of do-file
+file temp_trmatrix_g20.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1989c.dta
+year: all characters numeric; replaced as int
+1989
+(5,921,252 observations deleted)
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           21             20
+10%           22             20       Obs             835,792
+25%           26             20       Sum of Wgt.     835,792
+
+50%           38                      Mean           75.15216
+                        Largest       Std. Dev.      212.3279
+75%           68          23556
+90%          135          23566       Variance       45083.13
+95%          214          24875       Skewness       35.20646
+99%          599          25115       Kurtosis       2297.478
+(220,447 real changes made)
+(205,363 real changes made)
+(201,760 real changes made)
+(208,222 real changes made)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file quantile_y1.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+(6,285,894 observations deleted)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                       876,663
+        from master                   468,197  (_merge==1)
+        from using                    408,466  (_merge==2)
+
+    matched                           427,326  (_merge==3)
+    -----------------------------------------
+(876,663 observations deleted)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. *sum emp,detail
+. 
+. * Compute the same kind of statistics as above. 
+. set more off
+
+. 
+. sum emp,detail
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           22             20
+10%           24             20       Obs             427,326
+25%           31             20       Sum of Wgt.     427,326
+
+50%           50                      Mean           102.2811
+                        Largest       Std. Dev.      273.1909
+75%           98          17024
+90%          187          17029       Variance       74633.25
+95%          298          17238       Skewness       22.76907
+99%          863          23464       Kurtosis       894.7337
+
+. 
+. * Compute the same kind of statistics as above. 
+. 
+. generate q1_y2=0 
+
+. replace q1_y2=1 if emp<=r(p25)
+(109,029 real changes made)
+
+. 
+. generate q2_y2=0
+
+. replace q2_y2=1 if r(p25)<emp & emp<=r(p50)
+(108,159 real changes made)
+
+. 
+. generate q3_y2=0 
+
+. replace q3_y2=1 if r(p50)<emp & emp<=r(p75)
+(104,492 real changes made)
+
+. 
+. generate q4_y2=0
+
+. replace q4_y2=1 if r(p75)<emp & emp<=r(max)
+(105,646 real changes made)
+
+. 
+. *****************************************************************************
+> ***
+. * Now create some new variables, q11 which is the variable if a q1 to q1 tran
+> sition
+. * occuerd.
+. 
+. generate q11=0 
+
+. replace q11=1 if q1_y1==1 & q1_y2==1
+(32,190 real changes made)
+
+. 
+. generate q12=0 
+
+. replace q12=1 if q1_y1==1 & q2_y2==1
+(23,585 real changes made)
+
+. 
+. generate q13=0 
+
+. replace q13=1 if q1_y1==1 & q3_y2==1
+(13,018 real changes made)
+
+. 
+. generate q14=0 
+
+. replace q14=1 if q1_y1==1 & q4_y2==1
+(4,512 real changes made)
+
+. 
+. generate q21=0 
+
+. replace q21=1 if q2_y1==1 & q1_y2==1
+(33,231 real changes made)
+
+. 
+. generate q22=0 
+
+. replace q22=1 if q2_y1==1 & q2_y2==1
+(30,335 real changes made)
+
+. 
+. generate q23=0 
+
+. replace q23=1 if q2_y1==1 & q3_y2==1
+(18,944 real changes made)
+
+. 
+. generate q24=0 
+
+. replace q24=1 if q2_y1==1 & q4_y2==1
+(7,466 real changes made)
+
+. 
+. generate q31=0 
+
+. replace q31=1 if q3_y1==1 & q1_y2==1
+(29,746 real changes made)
+
+. 
+. generate q32=0 
+
+. replace q32=1 if q3_y1==1 & q2_y2==1
+(33,953 real changes made)
+
+. 
+. generate q33=0 
+
+. replace q33=1 if q3_y1==1 & q3_y2==1
+(31,537 real changes made)
+
+. 
+. generate q34=0 
+
+. replace q34=1 if q3_y1==1 & q4_y2==1
+(17,730 real changes made)
+
+. 
+. generate q41=0 
+
+. replace q41=1 if q4_y1==1 & q1_y2==1
+(13,862 real changes made)
+
+. 
+. generate q42=0 
+
+. replace q42=1 if q4_y1==1 & q2_y2==1
+(20,286 real changes made)
+
+. 
+. generate q43=0 
+
+. replace q43=1 if q4_y1==1 & q3_y2==1
+(40,993 real changes made)
+
+. 
+. generate q44=0 
+
+. replace q44=1 if q4_y1==1 & q4_y2==1
+(75,938 real changes made)
+
+. 
+. egen sum_q1=sum(q1_y1)
+
+. egen sum_q2=sum(q2_y1)
+
+. egen sum_q3=sum(q3_y1)
+
+. egen sum_q4=sum(q4_y1)
+
+. 
+. egen sum_q11=sum(q11)
+
+. egen sum_q12=sum(q12)
+
+. egen sum_q13=sum(q13)
+
+. egen sum_q14=sum(q14)
+
+. egen sum_q21=sum(q21)
+
+. egen sum_q22=sum(q22)
+
+. egen sum_q23=sum(q23)
+
+. egen sum_q24=sum(q24)
+
+. egen sum_q31=sum(q31)
+
+. egen sum_q32=sum(q32)
+
+. egen sum_q33=sum(q33)
+
+. egen sum_q34=sum(q34)
+
+. egen sum_q41=sum(q41)
+
+. egen sum_q42=sum(q42)
+
+. egen sum_q43=sum(q43)
+
+. egen sum_q44=sum(q44)
+
+. 
+. collapse sum_q1 sum_q2 sum_q3 sum_q4 ///
+> sum_q11 sum_q12 sum_q13 sum_q14 ///
+> sum_q21 sum_q22 sum_q23 sum_q24 ///
+> sum_q31 sum_q32 sum_q33 sum_q34 ///
+> sum_q41 sum_q42 sum_q43 sum_q44
+
+. 
+. gen p11=sum_q11/sum_q1
+
+. gen p12=sum_q12/sum_q1
+
+. gen p13=sum_q13/sum_q1
+
+. gen p14=sum_q14/sum_q1
+
+. gen p21=sum_q21/sum_q2
+
+. gen p22=sum_q22/sum_q2
+
+. gen p23=sum_q23/sum_q2
+
+. gen p24=sum_q24/sum_q2
+
+. gen p31=sum_q31/sum_q3
+
+. gen p32=sum_q32/sum_q3
+
+. gen p33=sum_q33/sum_q3
+
+. gen p34=sum_q34/sum_q3
+
+. gen p41=sum_q41/sum_q4
+
+. gen p42=sum_q42/sum_q4
+
+. gen p43=sum_q43/sum_q4
+
+. gen p44=sum_q44/sum_q4
+
+. 
+. 
+end of do-file
+file temp_trmatrix_g20.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1993c.dta
+year: all characters numeric; replaced as int
+1993
+(6,180,754 observations deleted)
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           21             20
+10%           22             20       Obs             866,628
+25%           26             20       Sum of Wgt.     866,628
+
+50%           37                      Mean           75.08792
+                        Largest       Std. Dev.      231.2512
+75%           68          19963
+90%          132          20046       Variance       53477.12
+95%          209          21006       Skewness       32.63103
+99%          587          23637       Kurtosis       1669.116
+(232,248 real changes made)
+(201,484 real changes made)
+(219,578 real changes made)
+(213,318 real changes made)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file quantile_y1.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+(6,588,816 observations deleted)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                       937,241
+        from master                   540,046  (_merge==1)
+        from using                    397,195  (_merge==2)
+
+    matched                           469,433  (_merge==3)
+    -----------------------------------------
+(937,241 observations deleted)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. *sum emp,detail
+. 
+. * Compute the same kind of statistics as above. 
+. set more off
+
+. 
+. sum emp,detail
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           22             20
+10%           24             20       Obs             469,433
+25%           32             20       Sum of Wgt.     469,433
+
+50%           51                      Mean           104.8821
+                        Largest       Std. Dev.      295.3374
+75%          100          17836
+90%          190          17919       Variance       87224.16
+95%          304          18410       Skewness       23.26239
+99%          861          23430       Kurtosis        858.878
+
+. 
+. * Compute the same kind of statistics as above. 
+. 
+. generate q1_y2=0 
+
+. replace q1_y2=1 if emp<=r(p25)
+(124,338 real changes made)
+
+. 
+. generate q2_y2=0
+
+. replace q2_y2=1 if r(p25)<emp & emp<=r(p50)
+(114,244 real changes made)
+
+. 
+. generate q3_y2=0 
+
+. replace q3_y2=1 if r(p50)<emp & emp<=r(p75)
+(114,613 real changes made)
+
+. 
+. generate q4_y2=0
+
+. replace q4_y2=1 if r(p75)<emp & emp<=r(max)
+(116,238 real changes made)
+
+. 
+. *****************************************************************************
+> ***
+. * Now create some new variables, q11 which is the variable if a q1 to q1 tran
+> sition
+. * occuerd.
+. 
+. generate q11=0 
+
+. replace q11=1 if q1_y1==1 & q1_y2==1
+(38,812 real changes made)
+
+. 
+. generate q12=0 
+
+. replace q12=1 if q1_y1==1 & q2_y2==1
+(25,561 real changes made)
+
+. 
+. generate q13=0 
+
+. replace q13=1 if q1_y1==1 & q3_y2==1
+(14,948 real changes made)
+
+. 
+. generate q14=0 
+
+. replace q14=1 if q1_y1==1 & q4_y2==1
+(5,179 real changes made)
+
+. 
+. generate q21=0 
+
+. replace q21=1 if q2_y1==1 & q1_y2==1
+(36,329 real changes made)
+
+. 
+. generate q22=0 
+
+. replace q22=1 if q2_y1==1 & q2_y2==1
+(30,946 real changes made)
+
+. 
+. generate q23=0 
+
+. replace q23=1 if q2_y1==1 & q3_y2==1
+(20,489 real changes made)
+
+. 
+. generate q24=0 
+
+. replace q24=1 if q2_y1==1 & q4_y2==1
+(7,882 real changes made)
+
+. 
+. generate q31=0 
+
+. replace q31=1 if q3_y1==1 & q1_y2==1
+(35,076 real changes made)
+
+. 
+. generate q32=0 
+
+. replace q32=1 if q3_y1==1 & q2_y2==1
+(37,936 real changes made)
+
+. 
+. generate q33=0 
+
+. replace q33=1 if q3_y1==1 & q3_y2==1
+(36,737 real changes made)
+
+. 
+. generate q34=0 
+
+. replace q34=1 if q3_y1==1 & q4_y2==1
+(20,396 real changes made)
+
+. 
+. generate q41=0 
+
+. replace q41=1 if q4_y1==1 & q1_y2==1
+(14,121 real changes made)
+
+. 
+. generate q42=0 
+
+. replace q42=1 if q4_y1==1 & q2_y2==1
+(19,801 real changes made)
+
+. 
+. generate q43=0 
+
+. replace q43=1 if q4_y1==1 & q3_y2==1
+(42,439 real changes made)
+
+. 
+. generate q44=0 
+
+. replace q44=1 if q4_y1==1 & q4_y2==1
+(82,781 real changes made)
+
+. 
+. egen sum_q1=sum(q1_y1)
+
+. egen sum_q2=sum(q2_y1)
+
+. egen sum_q3=sum(q3_y1)
+
+. egen sum_q4=sum(q4_y1)
+
+. 
+. egen sum_q11=sum(q11)
+
+. egen sum_q12=sum(q12)
+
+. egen sum_q13=sum(q13)
+
+. egen sum_q14=sum(q14)
+
+. egen sum_q21=sum(q21)
+
+. egen sum_q22=sum(q22)
+
+. egen sum_q23=sum(q23)
+
+. egen sum_q24=sum(q24)
+
+. egen sum_q31=sum(q31)
+
+. egen sum_q32=sum(q32)
+
+. egen sum_q33=sum(q33)
+
+. egen sum_q34=sum(q34)
+
+. egen sum_q41=sum(q41)
+
+. egen sum_q42=sum(q42)
+
+. egen sum_q43=sum(q43)
+
+. egen sum_q44=sum(q44)
+
+. 
+. collapse sum_q1 sum_q2 sum_q3 sum_q4 ///
+> sum_q11 sum_q12 sum_q13 sum_q14 ///
+> sum_q21 sum_q22 sum_q23 sum_q24 ///
+> sum_q31 sum_q32 sum_q33 sum_q34 ///
+> sum_q41 sum_q42 sum_q43 sum_q44
+
+. 
+. gen p11=sum_q11/sum_q1
+
+. gen p12=sum_q12/sum_q1
+
+. gen p13=sum_q13/sum_q1
+
+. gen p14=sum_q14/sum_q1
+
+. gen p21=sum_q21/sum_q2
+
+. gen p22=sum_q22/sum_q2
+
+. gen p23=sum_q23/sum_q2
+
+. gen p24=sum_q24/sum_q2
+
+. gen p31=sum_q31/sum_q3
+
+. gen p32=sum_q32/sum_q3
+
+. gen p33=sum_q33/sum_q3
+
+. gen p34=sum_q34/sum_q3
+
+. gen p41=sum_q41/sum_q4
+
+. gen p42=sum_q42/sum_q4
+
+. gen p43=sum_q43/sum_q4
+
+. gen p44=sum_q44/sum_q4
+
+. 
+. 
+end of do-file
+file temp_trmatrix_g20.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1995c.dta
+year: all characters numeric; replaced as int
+1995
+(6,379,159 observations deleted)
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           21             20
+10%           22             20       Obs             936,225
+25%           26             20       Sum of Wgt.     936,225
+
+50%           38                      Mean           74.44062
+                        Largest       Std. Dev.      212.7612
+75%           68          17822
+90%          132          18436       Variance       45267.32
+95%          209          18466       Skewness        30.7722
+99%          579          24245       Kurtosis       1580.669
+(248,171 real changes made)
+(232,020 real changes made)
+(224,986 real changes made)
+(231,048 real changes made)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file quantile_y1.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+(6,598,342 observations deleted)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                     1,008,670
+        from master                   573,938  (_merge==1)
+        from using                    434,732  (_merge==2)
+
+    matched                           501,493  (_merge==3)
+    -----------------------------------------
+(1,008,670 observations deleted)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. *sum emp,detail
+. 
+. * Compute the same kind of statistics as above. 
+. set more off
+
+. 
+. sum emp,detail
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           22             20
+10%           24             20       Obs             501,493
+25%           32             20       Sum of Wgt.     501,493
+
+50%           51                      Mean           104.6133
+                        Largest       Std. Dev.      299.1668
+75%           99          17429
+90%          188          18840       Variance       89500.76
+95%          302          19033       Skewness       22.23155
+99%          854          21957       Kurtosis       762.0253
+
+. 
+. * Compute the same kind of statistics as above. 
+. 
+. generate q1_y2=0 
+
+. replace q1_y2=1 if emp<=r(p25)
+(133,624 real changes made)
+
+. 
+. generate q2_y2=0
+
+. replace q2_y2=1 if r(p25)<emp & emp<=r(p50)
+(121,672 real changes made)
+
+. 
+. generate q3_y2=0 
+
+. replace q3_y2=1 if r(p50)<emp & emp<=r(p75)
+(122,064 real changes made)
+
+. 
+. generate q4_y2=0
+
+. replace q4_y2=1 if r(p75)<emp & emp<=r(max)
+(124,133 real changes made)
+
+. 
+. *****************************************************************************
+> ***
+. * Now create some new variables, q11 which is the variable if a q1 to q1 tran
+> sition
+. * occuerd.
+. 
+. generate q11=0 
+
+. replace q11=1 if q1_y1==1 & q1_y2==1
+(40,680 real changes made)
+
+. 
+. generate q12=0 
+
+. replace q12=1 if q1_y1==1 & q2_y2==1
+(26,555 real changes made)
+
+. 
+. generate q13=0 
+
+. replace q13=1 if q1_y1==1 & q3_y2==1
+(15,992 real changes made)
+
+. 
+. generate q14=0 
+
+. replace q14=1 if q1_y1==1 & q4_y2==1
+(5,884 real changes made)
+
+. 
+. generate q21=0 
+
+. replace q21=1 if q2_y1==1 & q1_y2==1
+(41,525 real changes made)
+
+. 
+. generate q22=0 
+
+. replace q22=1 if q2_y1==1 & q2_y2==1
+(34,596 real changes made)
+
+. 
+. generate q23=0 
+
+. replace q23=1 if q2_y1==1 & q3_y2==1
+(23,913 real changes made)
+
+. 
+. generate q24=0 
+
+. replace q24=1 if q2_y1==1 & q4_y2==1
+(9,510 real changes made)
+
+. 
+. generate q31=0 
+
+. replace q31=1 if q3_y1==1 & q1_y2==1
+(35,425 real changes made)
+
+. 
+. generate q32=0 
+
+. replace q32=1 if q3_y1==1 & q2_y2==1
+(38,835 real changes made)
+
+. 
+. generate q33=0 
+
+. replace q33=1 if q3_y1==1 & q3_y2==1
+(37,552 real changes made)
+
+. 
+. generate q34=0 
+
+. replace q34=1 if q3_y1==1 & q4_y2==1
+(21,151 real changes made)
+
+. 
+. generate q41=0 
+
+. replace q41=1 if q4_y1==1 & q1_y2==1
+(15,994 real changes made)
+
+. 
+. generate q42=0 
+
+. replace q42=1 if q4_y1==1 & q2_y2==1
+(21,686 real changes made)
+
+. 
+. generate q43=0 
+
+. replace q43=1 if q4_y1==1 & q3_y2==1
+(44,607 real changes made)
+
+. 
+. generate q44=0 
+
+. replace q44=1 if q4_y1==1 & q4_y2==1
+(87,588 real changes made)
+
+. 
+. egen sum_q1=sum(q1_y1)
+
+. egen sum_q2=sum(q2_y1)
+
+. egen sum_q3=sum(q3_y1)
+
+. egen sum_q4=sum(q4_y1)
+
+. 
+. egen sum_q11=sum(q11)
+
+. egen sum_q12=sum(q12)
+
+. egen sum_q13=sum(q13)
+
+. egen sum_q14=sum(q14)
+
+. egen sum_q21=sum(q21)
+
+. egen sum_q22=sum(q22)
+
+. egen sum_q23=sum(q23)
+
+. egen sum_q24=sum(q24)
+
+. egen sum_q31=sum(q31)
+
+. egen sum_q32=sum(q32)
+
+. egen sum_q33=sum(q33)
+
+. egen sum_q34=sum(q34)
+
+. egen sum_q41=sum(q41)
+
+. egen sum_q42=sum(q42)
+
+. egen sum_q43=sum(q43)
+
+. egen sum_q44=sum(q44)
+
+. 
+. collapse sum_q1 sum_q2 sum_q3 sum_q4 ///
+> sum_q11 sum_q12 sum_q13 sum_q14 ///
+> sum_q21 sum_q22 sum_q23 sum_q24 ///
+> sum_q31 sum_q32 sum_q33 sum_q34 ///
+> sum_q41 sum_q42 sum_q43 sum_q44
+
+. 
+. gen p11=sum_q11/sum_q1
+
+. gen p12=sum_q12/sum_q1
+
+. gen p13=sum_q13/sum_q1
+
+. gen p14=sum_q14/sum_q1
+
+. gen p21=sum_q21/sum_q2
+
+. gen p22=sum_q22/sum_q2
+
+. gen p23=sum_q23/sum_q2
+
+. gen p24=sum_q24/sum_q2
+
+. gen p31=sum_q31/sum_q3
+
+. gen p32=sum_q32/sum_q3
+
+. gen p33=sum_q33/sum_q3
+
+. gen p34=sum_q34/sum_q3
+
+. gen p41=sum_q41/sum_q4
+
+. gen p42=sum_q42/sum_q4
+
+. gen p43=sum_q43/sum_q4
+
+. gen p44=sum_q44/sum_q4
+
+. 
+. 
+end of do-file
+file temp_trmatrix_g20.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1980c.dta
+year: all characters numeric; replaced as int
+1980
+(4,989,829 observations deleted)
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           21             20
+10%           22             20       Obs             650,527
+25%           26             20       Sum of Wgt.     650,527
+
+50%           38                      Mean           79.98863
+                        Largest       Std. Dev.      253.9893
+75%           69          23418
+90%          143          23987       Variance       64510.58
+95%          232          25122       Skewness       38.53495
+99%          676          25314       Kurtosis       2537.914
+(172,293 real changes made)
+(157,022 real changes made)
+(159,238 real changes made)
+(161,974 real changes made)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file quantile_y1.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+(5,525,423 observations deleted)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                       742,634
+        from master                   413,409  (_merge==1)
+        from using                    329,225  (_merge==2)
+
+    matched                           321,302  (_merge==3)
+    -----------------------------------------
+(742,634 observations deleted)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. *sum emp,detail
+. 
+. * Compute the same kind of statistics as above. 
+. set more off
+
+. 
+. sum emp,detail
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           22             20
+10%           24             20       Obs             321,302
+25%           32             20       Sum of Wgt.     321,302
+
+50%           52                      Mean           108.2881
+                        Largest       Std. Dev.      302.8977
+75%          101          18855
+90%          201          20776       Variance          91747
+95%          322          21608       Skewness       27.96485
+99%          912          21950       Kurtosis       1324.628
+
+. 
+. * Compute the same kind of statistics as above. 
+. 
+. generate q1_y2=0 
+
+. replace q1_y2=1 if emp<=r(p25)
+(83,605 real changes made)
+
+. 
+. generate q2_y2=0
+
+. replace q2_y2=1 if r(p25)<emp & emp<=r(p50)
+(77,763 real changes made)
+
+. 
+. generate q3_y2=0 
+
+. replace q3_y2=1 if r(p50)<emp & emp<=r(p75)
+(79,663 real changes made)
+
+. 
+. generate q4_y2=0
+
+. replace q4_y2=1 if r(p75)<emp & emp<=r(max)
+(80,271 real changes made)
+
+. 
+. *****************************************************************************
+> ***
+. * Now create some new variables, q11 which is the variable if a q1 to q1 tran
+> sition
+. * occuerd.
+. 
+. generate q11=0 
+
+. replace q11=1 if q1_y1==1 & q1_y2==1
+(25,300 real changes made)
+
+. 
+. generate q12=0 
+
+. replace q12=1 if q1_y1==1 & q2_y2==1
+(16,622 real changes made)
+
+. 
+. generate q13=0 
+
+. replace q13=1 if q1_y1==1 & q3_y2==1
+(9,681 real changes made)
+
+. 
+. generate q14=0 
+
+. replace q14=1 if q1_y1==1 & q4_y2==1
+(3,749 real changes made)
+
+. 
+. generate q21=0 
+
+. replace q21=1 if q2_y1==1 & q1_y2==1
+(24,897 real changes made)
+
+. 
+. generate q22=0 
+
+. replace q22=1 if q2_y1==1 & q2_y2==1
+(20,684 real changes made)
+
+. 
+. generate q23=0 
+
+. replace q23=1 if q2_y1==1 & q3_y2==1
+(14,215 real changes made)
+
+. 
+. generate q24=0 
+
+. replace q24=1 if q2_y1==1 & q4_y2==1
+(5,926 real changes made)
+
+. 
+. generate q31=0 
+
+. replace q31=1 if q3_y1==1 & q1_y2==1
+(22,534 real changes made)
+
+. 
+. generate q32=0 
+
+. replace q32=1 if q3_y1==1 & q2_y2==1
+(24,532 real changes made)
+
+. 
+. generate q33=0 
+
+. replace q33=1 if q3_y1==1 & q3_y2==1
+(25,005 real changes made)
+
+. 
+. generate q34=0 
+
+. replace q34=1 if q3_y1==1 & q4_y2==1
+(13,838 real changes made)
+
+. 
+. generate q41=0 
+
+. replace q41=1 if q4_y1==1 & q1_y2==1
+(10,874 real changes made)
+
+. 
+. generate q42=0 
+
+. replace q42=1 if q4_y1==1 & q2_y2==1
+(15,925 real changes made)
+
+. 
+. generate q43=0 
+
+. replace q43=1 if q4_y1==1 & q3_y2==1
+(30,762 real changes made)
+
+. 
+. generate q44=0 
+
+. replace q44=1 if q4_y1==1 & q4_y2==1
+(56,758 real changes made)
+
+. 
+. egen sum_q1=sum(q1_y1)
+
+. egen sum_q2=sum(q2_y1)
+
+. egen sum_q3=sum(q3_y1)
+
+. egen sum_q4=sum(q4_y1)
+
+. 
+. egen sum_q11=sum(q11)
+
+. egen sum_q12=sum(q12)
+
+. egen sum_q13=sum(q13)
+
+. egen sum_q14=sum(q14)
+
+. egen sum_q21=sum(q21)
+
+. egen sum_q22=sum(q22)
+
+. egen sum_q23=sum(q23)
+
+. egen sum_q24=sum(q24)
+
+. egen sum_q31=sum(q31)
+
+. egen sum_q32=sum(q32)
+
+. egen sum_q33=sum(q33)
+
+. egen sum_q34=sum(q34)
+
+. egen sum_q41=sum(q41)
+
+. egen sum_q42=sum(q42)
+
+. egen sum_q43=sum(q43)
+
+. egen sum_q44=sum(q44)
+
+. 
+. collapse sum_q1 sum_q2 sum_q3 sum_q4 ///
+> sum_q11 sum_q12 sum_q13 sum_q14 ///
+> sum_q21 sum_q22 sum_q23 sum_q24 ///
+> sum_q31 sum_q32 sum_q33 sum_q34 ///
+> sum_q41 sum_q42 sum_q43 sum_q44
+
+. 
+. gen p11=sum_q11/sum_q1
+
+. gen p12=sum_q12/sum_q1
+
+. gen p13=sum_q13/sum_q1
+
+. gen p14=sum_q14/sum_q1
+
+. gen p21=sum_q21/sum_q2
+
+. gen p22=sum_q22/sum_q2
+
+. gen p23=sum_q23/sum_q2
+
+. gen p24=sum_q24/sum_q2
+
+. gen p31=sum_q31/sum_q3
+
+. gen p32=sum_q32/sum_q3
+
+. gen p33=sum_q33/sum_q3
+
+. gen p34=sum_q34/sum_q3
+
+. gen p41=sum_q41/sum_q4
+
+. gen p42=sum_q42/sum_q4
+
+. gen p43=sum_q43/sum_q4
+
+. gen p44=sum_q44/sum_q4
+
+. 
+. 
+end of do-file
+file temp_trmatrix_g20.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1979c.dta
+year: all characters numeric; replaced as int
+1979
+(4,938,791 observations deleted)
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           21             20
+10%           22             20       Obs             660,373
+25%           26             20       Sum of Wgt.     660,373
+
+50%           38                      Mean           80.92326
+                        Largest       Std. Dev.      270.0324
+75%           69          23865
+90%          144          24330       Variance       72917.49
+95%          236          26424       Skewness       38.83191
+99%          694          29308       Kurtosis       2443.499
+(174,492 real changes made)
+(159,087 real changes made)
+(163,869 real changes made)
+(162,925 real changes made)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file quantile_y1.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+(5,355,653 observations deleted)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                       721,444
+        from master                   379,321  (_merge==1)
+        from using                    342,123  (_merge==2)
+
+    matched                           318,250  (_merge==3)
+    -----------------------------------------
+(721,444 observations deleted)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. *sum emp,detail
+. 
+. * Compute the same kind of statistics as above. 
+. set more off
+
+. 
+. sum emp,detail
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           22             20
+10%           24             20       Obs             318,250
+25%           31             20       Sum of Wgt.     318,250
+
+50%           51                      Mean           108.4144
+                        Largest       Std. Dev.      319.6997
+75%          101          20052
+90%          202          20052       Variance       102207.9
+95%          325          20052       Skewness       29.27382
+99%          929          20052       Kurtosis       1360.788
+
+. 
+. * Compute the same kind of statistics as above. 
+. 
+. generate q1_y2=0 
+
+. replace q1_y2=1 if emp<=r(p25)
+(80,685 real changes made)
+
+. 
+. generate q2_y2=0
+
+. replace q2_y2=1 if r(p25)<emp & emp<=r(p50)
+(79,711 real changes made)
+
+. 
+. generate q3_y2=0 
+
+. replace q3_y2=1 if r(p50)<emp & emp<=r(p75)
+(78,883 real changes made)
+
+. 
+. generate q4_y2=0
+
+. replace q4_y2=1 if r(p75)<emp & emp<=r(max)
+(78,971 real changes made)
+
+. 
+. *****************************************************************************
+> ***
+. * Now create some new variables, q11 which is the variable if a q1 to q1 tran
+> sition
+. * occuerd.
+. 
+. generate q11=0 
+
+. replace q11=1 if q1_y1==1 & q1_y2==1
+(23,596 real changes made)
+
+. 
+. generate q12=0 
+
+. replace q12=1 if q1_y1==1 & q2_y2==1
+(16,523 real changes made)
+
+. 
+. generate q13=0 
+
+. replace q13=1 if q1_y1==1 & q3_y2==1
+(9,218 real changes made)
+
+. 
+. generate q14=0 
+
+. replace q14=1 if q1_y1==1 & q4_y2==1
+(3,255 real changes made)
+
+. 
+. generate q21=0 
+
+. replace q21=1 if q2_y1==1 & q1_y2==1
+(23,902 real changes made)
+
+. 
+. generate q22=0 
+
+. replace q22=1 if q2_y1==1 & q2_y2==1
+(20,952 real changes made)
+
+. 
+. generate q23=0 
+
+. replace q23=1 if q2_y1==1 & q3_y2==1
+(13,944 real changes made)
+
+. 
+. generate q24=0 
+
+. replace q24=1 if q2_y1==1 & q4_y2==1
+(5,390 real changes made)
+
+. 
+. generate q31=0 
+
+. replace q31=1 if q3_y1==1 & q1_y2==1
+(22,288 real changes made)
+
+. 
+. generate q32=0 
+
+. replace q32=1 if q3_y1==1 & q2_y2==1
+(25,826 real changes made)
+
+. 
+. generate q33=0 
+
+. replace q33=1 if q3_y1==1 & q3_y2==1
+(25,027 real changes made)
+
+. 
+. generate q34=0 
+
+. replace q34=1 if q3_y1==1 & q4_y2==1
+(13,359 real changes made)
+
+. 
+. generate q41=0 
+
+. replace q41=1 if q4_y1==1 & q1_y2==1
+(10,899 real changes made)
+
+. 
+. generate q42=0 
+
+. replace q42=1 if q4_y1==1 & q2_y2==1
+(16,410 real changes made)
+
+. 
+. generate q43=0 
+
+. replace q43=1 if q4_y1==1 & q3_y2==1
+(30,694 real changes made)
+
+. 
+. generate q44=0 
+
+. replace q44=1 if q4_y1==1 & q4_y2==1
+(56,967 real changes made)
+
+. 
+. egen sum_q1=sum(q1_y1)
+
+. egen sum_q2=sum(q2_y1)
+
+. egen sum_q3=sum(q3_y1)
+
+. egen sum_q4=sum(q4_y1)
+
+. 
+. egen sum_q11=sum(q11)
+
+. egen sum_q12=sum(q12)
+
+. egen sum_q13=sum(q13)
+
+. egen sum_q14=sum(q14)
+
+. egen sum_q21=sum(q21)
+
+. egen sum_q22=sum(q22)
+
+. egen sum_q23=sum(q23)
+
+. egen sum_q24=sum(q24)
+
+. egen sum_q31=sum(q31)
+
+. egen sum_q32=sum(q32)
+
+. egen sum_q33=sum(q33)
+
+. egen sum_q34=sum(q34)
+
+. egen sum_q41=sum(q41)
+
+. egen sum_q42=sum(q42)
+
+. egen sum_q43=sum(q43)
+
+. egen sum_q44=sum(q44)
+
+. 
+. collapse sum_q1 sum_q2 sum_q3 sum_q4 ///
+> sum_q11 sum_q12 sum_q13 sum_q14 ///
+> sum_q21 sum_q22 sum_q23 sum_q24 ///
+> sum_q31 sum_q32 sum_q33 sum_q34 ///
+> sum_q41 sum_q42 sum_q43 sum_q44
+
+. 
+. gen p11=sum_q11/sum_q1
+
+. gen p12=sum_q12/sum_q1
+
+. gen p13=sum_q13/sum_q1
+
+. gen p14=sum_q14/sum_q1
+
+. gen p21=sum_q21/sum_q2
+
+. gen p22=sum_q22/sum_q2
+
+. gen p23=sum_q23/sum_q2
+
+. gen p24=sum_q24/sum_q2
+
+. gen p31=sum_q31/sum_q3
+
+. gen p32=sum_q32/sum_q3
+
+. gen p33=sum_q33/sum_q3
+
+. gen p34=sum_q34/sum_q3
+
+. gen p41=sum_q41/sum_q4
+
+. gen p42=sum_q42/sum_q4
+
+. gen p43=sum_q43/sum_q4
+
+. gen p44=sum_q44/sum_q4
+
+. 
+. 
+end of do-file
+file temp_trmatrix_g20.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1976c.dta
+year: all characters numeric; replaced as int
+1976
+(4,146,135 observations deleted)
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           21             20
+10%           22             20       Obs             527,199
+25%           26             20       Sum of Wgt.     527,199
+
+50%           39                      Mean            91.2841
+                        Largest       Std. Dev.      309.4757
+75%           71          25103
+90%          157          27408       Variance       95775.19
+95%          277          28918       Skewness       29.89742
+99%          902          29218       Kurtosis       1579.764
+(136,970 real changes made)
+(132,940 real changes made)
+(125,557 real changes made)
+(131,732 real changes made)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file quantile_y1.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+(5,079,484 observations deleted)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                       653,027
+        from master                   390,109  (_merge==1)
+        from using                    262,918  (_merge==2)
+
+    matched                           264,281  (_merge==3)
+    -----------------------------------------
+(653,027 observations deleted)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. *sum emp,detail
+. 
+. * Compute the same kind of statistics as above. 
+. set more off
+
+. 
+. sum emp,detail
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           22             20
+10%           24             20       Obs             264,281
+25%           33             20       Sum of Wgt.     264,281
+
+50%           55                      Mean           121.7687
+                        Largest       Std. Dev.      388.4781
+75%          111          25039
+90%          226          28135       Variance       150915.2
+95%          369          28363       Skewness       30.78743
+99%         1066          28566       Kurtosis        1493.86
+
+. 
+. * Compute the same kind of statistics as above. 
+. 
+. generate q1_y2=0 
+
+. replace q1_y2=1 if emp<=r(p25)
+(69,737 real changes made)
+
+. 
+. generate q2_y2=0
+
+. replace q2_y2=1 if r(p25)<emp & emp<=r(p50)
+(63,663 real changes made)
+
+. 
+. generate q3_y2=0 
+
+. replace q3_y2=1 if r(p50)<emp & emp<=r(p75)
+(64,835 real changes made)
+
+. 
+. generate q4_y2=0
+
+. replace q4_y2=1 if r(p75)<emp & emp<=r(max)
+(66,046 real changes made)
+
+. 
+. *****************************************************************************
+> ***
+. * Now create some new variables, q11 which is the variable if a q1 to q1 tran
+> sition
+. * occuerd.
+. 
+. generate q11=0 
+
+. replace q11=1 if q1_y1==1 & q1_y2==1
+(20,927 real changes made)
+
+. 
+. generate q12=0 
+
+. replace q12=1 if q1_y1==1 & q2_y2==1
+(13,740 real changes made)
+
+. 
+. generate q13=0 
+
+. replace q13=1 if q1_y1==1 & q3_y2==1
+(8,077 real changes made)
+
+. 
+. generate q14=0 
+
+. replace q14=1 if q1_y1==1 & q4_y2==1
+(3,225 real changes made)
+
+. 
+. generate q21=0 
+
+. replace q21=1 if q2_y1==1 & q1_y2==1
+(21,224 real changes made)
+
+. 
+. generate q22=0 
+
+. replace q22=1 if q2_y1==1 & q2_y2==1
+(17,717 real changes made)
+
+. 
+. generate q23=0 
+
+. replace q23=1 if q2_y1==1 & q3_y2==1
+(12,893 real changes made)
+
+. 
+. generate q24=0 
+
+. replace q24=1 if q2_y1==1 & q4_y2==1
+(5,768 real changes made)
+
+. 
+. generate q31=0 
+
+. replace q31=1 if q3_y1==1 & q1_y2==1
+(18,036 real changes made)
+
+. 
+. generate q32=0 
+
+. replace q32=1 if q3_y1==1 & q2_y2==1
+(19,140 real changes made)
+
+. 
+. generate q33=0 
+
+. replace q33=1 if q3_y1==1 & q3_y2==1
+(19,251 real changes made)
+
+. 
+. generate q34=0 
+
+. replace q34=1 if q3_y1==1 & q4_y2==1
+(12,094 real changes made)
+
+. 
+. generate q41=0 
+
+. replace q41=1 if q4_y1==1 & q1_y2==1
+(9,550 real changes made)
+
+. 
+. generate q42=0 
+
+. replace q42=1 if q4_y1==1 & q2_y2==1
+(13,066 real changes made)
+
+. 
+. generate q43=0 
+
+. replace q43=1 if q4_y1==1 & q3_y2==1
+(24,614 real changes made)
+
+. 
+. generate q44=0 
+
+. replace q44=1 if q4_y1==1 & q4_y2==1
+(44,959 real changes made)
+
+. 
+. egen sum_q1=sum(q1_y1)
+
+. egen sum_q2=sum(q2_y1)
+
+. egen sum_q3=sum(q3_y1)
+
+. egen sum_q4=sum(q4_y1)
+
+. 
+. egen sum_q11=sum(q11)
+
+. egen sum_q12=sum(q12)
+
+. egen sum_q13=sum(q13)
+
+. egen sum_q14=sum(q14)
+
+. egen sum_q21=sum(q21)
+
+. egen sum_q22=sum(q22)
+
+. egen sum_q23=sum(q23)
+
+. egen sum_q24=sum(q24)
+
+. egen sum_q31=sum(q31)
+
+. egen sum_q32=sum(q32)
+
+. egen sum_q33=sum(q33)
+
+. egen sum_q34=sum(q34)
+
+. egen sum_q41=sum(q41)
+
+. egen sum_q42=sum(q42)
+
+. egen sum_q43=sum(q43)
+
+. egen sum_q44=sum(q44)
+
+. 
+. collapse sum_q1 sum_q2 sum_q3 sum_q4 ///
+> sum_q11 sum_q12 sum_q13 sum_q14 ///
+> sum_q21 sum_q22 sum_q23 sum_q24 ///
+> sum_q31 sum_q32 sum_q33 sum_q34 ///
+> sum_q41 sum_q42 sum_q43 sum_q44
+
+. 
+. gen p11=sum_q11/sum_q1
+
+. gen p12=sum_q12/sum_q1
+
+. gen p13=sum_q13/sum_q1
+
+. gen p14=sum_q14/sum_q1
+
+. gen p21=sum_q21/sum_q2
+
+. gen p22=sum_q22/sum_q2
+
+. gen p23=sum_q23/sum_q2
+
+. gen p24=sum_q24/sum_q2
+
+. gen p31=sum_q31/sum_q3
+
+. gen p32=sum_q32/sum_q3
+
+. gen p33=sum_q33/sum_q3
+
+. gen p34=sum_q34/sum_q3
+
+. gen p41=sum_q41/sum_q4
+
+. gen p42=sum_q42/sum_q4
+
+. gen p43=sum_q43/sum_q4
+
+. gen p44=sum_q44/sum_q4
+
+. 
+. 
+end of do-file
+file temp_trmatrix_g20.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1996c.dta
+year: all characters numeric; replaced as int
+1996
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1978c.dta
+year: all characters numeric; replaced as int
+1978
+(4,905,146 observations deleted)
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           21             20
+10%           22             20       Obs             613,383
+25%           26             20       Sum of Wgt.     613,383
+
+50%           38                      Mean            81.9288
+                        Largest       Std. Dev.      284.7048
+75%           69          23638
+90%          144          25305       Variance       81056.81
+95%          237          27143       Skewness       39.09545
+99%          713          27150       Kurtosis       2409.818
+(163,630 real changes made)
+(148,062 real changes made)
+(150,593 real changes made)
+(151,098 real changes made)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file quantile_y1.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+(5,210,921 observations deleted)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                       676,177
+        from master                   358,354  (_merge==1)
+        from using                    317,823  (_merge==2)
+
+    matched                           295,560  (_merge==3)
+    -----------------------------------------
+(676,177 observations deleted)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. *sum emp,detail
+. 
+. * Compute the same kind of statistics as above. 
+. set more off
+
+. 
+. sum emp,detail
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           22             20
+10%           24             20       Obs             295,560
+25%           31             20       Sum of Wgt.     295,560
+
+50%           51                      Mean           110.5476
+                        Largest       Std. Dev.      352.6918
+75%          100          22395
+90%          202          22395       Variance       124391.5
+95%          328          24742       Skewness       31.26745
+99%          978          24750       Kurtosis       1465.206
+
+. 
+. * Compute the same kind of statistics as above. 
+. 
+. generate q1_y2=0 
+
+. replace q1_y2=1 if emp<=r(p25)
+(74,614 real changes made)
+
+. 
+. generate q2_y2=0
+
+. replace q2_y2=1 if r(p25)<emp & emp<=r(p50)
+(74,201 real changes made)
+
+. 
+. generate q3_y2=0 
+
+. replace q3_y2=1 if r(p50)<emp & emp<=r(p75)
+(72,896 real changes made)
+
+. 
+. generate q4_y2=0
+
+. replace q4_y2=1 if r(p75)<emp & emp<=r(max)
+(73,849 real changes made)
+
+. 
+. *****************************************************************************
+> ***
+. * Now create some new variables, q11 which is the variable if a q1 to q1 tran
+> sition
+. * occuerd.
+. 
+. generate q11=0 
+
+. replace q11=1 if q1_y1==1 & q1_y2==1
+(22,031 real changes made)
+
+. 
+. generate q12=0 
+
+. replace q12=1 if q1_y1==1 & q2_y2==1
+(15,564 real changes made)
+
+. 
+. generate q13=0 
+
+. replace q13=1 if q1_y1==1 & q3_y2==1
+(8,625 real changes made)
+
+. 
+. generate q14=0 
+
+. replace q14=1 if q1_y1==1 & q4_y2==1
+(3,148 real changes made)
+
+. 
+. generate q21=0 
+
+. replace q21=1 if q2_y1==1 & q1_y2==1
+(22,190 real changes made)
+
+. 
+. generate q22=0 
+
+. replace q22=1 if q2_y1==1 & q2_y2==1
+(19,368 real changes made)
+
+. 
+. generate q23=0 
+
+. replace q23=1 if q2_y1==1 & q3_y2==1
+(12,935 real changes made)
+
+. 
+. generate q24=0 
+
+. replace q24=1 if q2_y1==1 & q4_y2==1
+(5,284 real changes made)
+
+. 
+. generate q31=0 
+
+. replace q31=1 if q3_y1==1 & q1_y2==1
+(20,470 real changes made)
+
+. 
+. generate q32=0 
+
+. replace q32=1 if q3_y1==1 & q2_y2==1
+(23,853 real changes made)
+
+. 
+. generate q33=0 
+
+. replace q33=1 if q3_y1==1 & q3_y2==1
+(22,670 real changes made)
+
+. 
+. generate q34=0 
+
+. replace q34=1 if q3_y1==1 & q4_y2==1
+(12,645 real changes made)
+
+. 
+. generate q41=0 
+
+. replace q41=1 if q4_y1==1 & q1_y2==1
+(9,923 real changes made)
+
+. 
+. generate q42=0 
+
+. replace q42=1 if q4_y1==1 & q2_y2==1
+(15,416 real changes made)
+
+. 
+. generate q43=0 
+
+. replace q43=1 if q4_y1==1 & q3_y2==1
+(28,666 real changes made)
+
+. 
+. generate q44=0 
+
+. replace q44=1 if q4_y1==1 & q4_y2==1
+(52,772 real changes made)
+
+. 
+. egen sum_q1=sum(q1_y1)
+
+. egen sum_q2=sum(q2_y1)
+
+. egen sum_q3=sum(q3_y1)
+
+. egen sum_q4=sum(q4_y1)
+
+. 
+. egen sum_q11=sum(q11)
+
+. egen sum_q12=sum(q12)
+
+. egen sum_q13=sum(q13)
+
+. egen sum_q14=sum(q14)
+
+. egen sum_q21=sum(q21)
+
+. egen sum_q22=sum(q22)
+
+. egen sum_q23=sum(q23)
+
+. egen sum_q24=sum(q24)
+
+. egen sum_q31=sum(q31)
+
+. egen sum_q32=sum(q32)
+
+. egen sum_q33=sum(q33)
+
+. egen sum_q34=sum(q34)
+
+. egen sum_q41=sum(q41)
+
+. egen sum_q42=sum(q42)
+
+. egen sum_q43=sum(q43)
+
+. egen sum_q44=sum(q44)
+
+. 
+. collapse sum_q1 sum_q2 sum_q3 sum_q4 ///
+> sum_q11 sum_q12 sum_q13 sum_q14 ///
+> sum_q21 sum_q22 sum_q23 sum_q24 ///
+> sum_q31 sum_q32 sum_q33 sum_q34 ///
+> sum_q41 sum_q42 sum_q43 sum_q44
+
+. 
+. gen p11=sum_q11/sum_q1
+
+. gen p12=sum_q12/sum_q1
+
+. gen p13=sum_q13/sum_q1
+
+. gen p14=sum_q14/sum_q1
+
+. gen p21=sum_q21/sum_q2
+
+. gen p22=sum_q22/sum_q2
+
+. gen p23=sum_q23/sum_q2
+
+. gen p24=sum_q24/sum_q2
+
+. gen p31=sum_q31/sum_q3
+
+. gen p32=sum_q32/sum_q3
+
+. gen p33=sum_q33/sum_q3
+
+. gen p34=sum_q34/sum_q3
+
+. gen p41=sum_q41/sum_q4
+
+. gen p42=sum_q42/sum_q4
+
+. gen p43=sum_q43/sum_q4
+
+. gen p44=sum_q44/sum_q4
+
+. 
+. 
+end of do-file
+file temp_trmatrix_g20.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+synlbd1991c.dta
+year: all characters numeric; replaced as int
+1991
+(6,059,783 observations deleted)
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           21             20
+10%           22             20       Obs             856,496
+25%           26             20       Sum of Wgt.     856,496
+
+50%           37                      Mean            73.7087
+                        Largest       Std. Dev.       206.943
+75%           67          22180
+90%          131          22746       Variance       42825.42
+95%          206          22913       Skewness       33.30956
+99%          583          23009       Kurtosis       2025.561
+(230,216 real changes made)
+(200,776 real changes made)
+(213,343 real changes made)
+(212,161 real changes made)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+file quantile_y1.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+(6,487,333 observations deleted)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                       904,423
+        from master                   506,742  (_merge==1)
+        from using                    397,681  (_merge==2)
+
+    matched                           458,815  (_merge==3)
+    -----------------------------------------
+(904,423 observations deleted)
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. *sum emp,detail
+. 
+. * Compute the same kind of statistics as above. 
+. set more off
+
+. 
+. sum emp,detail
+
+               (synthetic) March 12 Employment
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           20             20
+ 5%           22             20
+10%           24             20       Obs             458,815
+25%           31             20       Sum of Wgt.     458,815
+
+50%           50                      Mean           103.4869
+                        Largest       Std. Dev.       302.765
+75%           99          17486
+90%          186          19469       Variance       91666.65
+95%          299          22654       Skewness       27.11337
+99%          854          23132       Kurtosis       1155.198
+
+. 
+. * Compute the same kind of statistics as above. 
+. 
+. generate q1_y2=0 
+
+. replace q1_y2=1 if emp<=r(p25)
+(115,514 real changes made)
+
+. 
+. generate q2_y2=0
+
+. replace q2_y2=1 if r(p25)<emp & emp<=r(p50)
+(115,692 real changes made)
+
+. 
+. generate q3_y2=0 
+
+. replace q3_y2=1 if r(p50)<emp & emp<=r(p75)
+(114,276 real changes made)
+
+. 
+. generate q4_y2=0
+
+. replace q4_y2=1 if r(p75)<emp & emp<=r(max)
+(113,333 real changes made)
+
+. 
+. *****************************************************************************
+> ***
+. * Now create some new variables, q11 which is the variable if a q1 to q1 tran
+> sition
+. * occuerd.
+. 
+. generate q11=0 
+
+. replace q11=1 if q1_y1==1 & q1_y2==1
+(36,002 real changes made)
+
+. 
+. generate q12=0 
+
+. replace q12=1 if q1_y1==1 & q2_y2==1
+(26,029 real changes made)
+
+. 
+. generate q13=0 
+
+. replace q13=1 if q1_y1==1 & q3_y2==1
+(15,078 real changes made)
+
+. 
+. generate q14=0 
+
+. replace q14=1 if q1_y1==1 & q4_y2==1
+(4,906 real changes made)
+
+. 
+. generate q21=0 
+
+. replace q21=1 if q2_y1==1 & q1_y2==1
+(34,087 real changes made)
+
+. 
+. generate q22=0 
+
+. replace q22=1 if q2_y1==1 & q2_y2==1
+(31,786 real changes made)
+
+. 
+. generate q23=0 
+
+. replace q23=1 if q2_y1==1 & q3_y2==1
+(20,570 real changes made)
+
+. 
+. generate q24=0 
+
+. replace q24=1 if q2_y1==1 & q4_y2==1
+(7,566 real changes made)
+
+. 
+. generate q31=0 
+
+. replace q31=1 if q3_y1==1 & q1_y2==1
+(32,105 real changes made)
+
+. 
+. generate q32=0 
+
+. replace q32=1 if q3_y1==1 & q2_y2==1
+(37,599 real changes made)
+
+. 
+. generate q33=0 
+
+. replace q33=1 if q3_y1==1 & q3_y2==1
+(35,684 real changes made)
+
+. 
+. generate q34=0 
+
+. replace q34=1 if q3_y1==1 & q4_y2==1
+(19,493 real changes made)
+
+. 
+. generate q41=0 
+
+. replace q41=1 if q4_y1==1 & q1_y2==1
+(13,320 real changes made)
+
+. 
+. generate q42=0 
+
+. replace q42=1 if q4_y1==1 & q2_y2==1
+(20,278 real changes made)
+
+. 
+. generate q43=0 
+
+. replace q43=1 if q4_y1==1 & q3_y2==1
+(42,944 real changes made)
+
+. 
+. generate q44=0 
+
+. replace q44=1 if q4_y1==1 & q4_y2==1
+(81,368 real changes made)
+
+. 
+. egen sum_q1=sum(q1_y1)
+
+. egen sum_q2=sum(q2_y1)
+
+. egen sum_q3=sum(q3_y1)
+
+. egen sum_q4=sum(q4_y1)
+
+. 
+. egen sum_q11=sum(q11)
+
+. egen sum_q12=sum(q12)
+
+. egen sum_q13=sum(q13)
+
+. egen sum_q14=sum(q14)
+
+. egen sum_q21=sum(q21)
+
+. egen sum_q22=sum(q22)
+
+. egen sum_q23=sum(q23)
+
+. egen sum_q24=sum(q24)
+
+. egen sum_q31=sum(q31)
+
+. egen sum_q32=sum(q32)
+
+. egen sum_q33=sum(q33)
+
+. egen sum_q34=sum(q34)
+
+. egen sum_q41=sum(q41)
+
+. egen sum_q42=sum(q42)
+
+. egen sum_q43=sum(q43)
+
+. egen sum_q44=sum(q44)
+
+. 
+. collapse sum_q1 sum_q2 sum_q3 sum_q4 ///
+> sum_q11 sum_q12 sum_q13 sum_q14 ///
+> sum_q21 sum_q22 sum_q23 sum_q24 ///
+> sum_q31 sum_q32 sum_q33 sum_q34 ///
+> sum_q41 sum_q42 sum_q43 sum_q44
+
+. 
+. gen p11=sum_q11/sum_q1
+
+. gen p12=sum_q12/sum_q1
+
+. gen p13=sum_q13/sum_q1
+
+. gen p14=sum_q14/sum_q1
+
+. gen p21=sum_q21/sum_q2
+
+. gen p22=sum_q22/sum_q2
+
+. gen p23=sum_q23/sum_q2
+
+. gen p24=sum_q24/sum_q2
+
+. gen p31=sum_q31/sum_q3
+
+. gen p32=sum_q32/sum_q3
+
+. gen p33=sum_q33/sum_q3
+
+. gen p34=sum_q34/sum_q3
+
+. gen p41=sum_q41/sum_q4
+
+. gen p42=sum_q42/sum_q4
+
+. gen p43=sum_q43/sum_q4
+
+. gen p44=sum_q44/sum_q4
+
+. 
+. 
+end of do-file
+file temp_trmatrix_g20.dta saved
+/home/rdcprojects/tr/tr00612/data/synlbd/2.0.2
+
+. 
+. *****************************************************************************
+> ***
+. *cd "/rdcprojects/tr/tr00612/programs/users/spec676/PTW_AER/"
+. cd $rootdir
+/home/rdcprojects/tr/tr00612/programs/users/lv39/aearep-915/PTW_AER
+
+. 
+. use temp_trmatrix_g20.dta
+
+. 
+. *****************************************************************************
+> ***
+. * Report stuff...
+. sum p31
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         p31 |         20    .2620557    .0058699   .2509702   .2716642
+
+. 
+. sum p32
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         p32 |         20    .2907951    .0062876   .2793304   .3010786
+
+. 
+. sum p33
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         p33 |         20    .2852168    .0051131   .2789457   .2971338
+
+. 
+. sum p34
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         p34 |         20    .1619324    .0057147   .1544393   .1765006
+
+. 
+. sum p41
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         p41 |         20    .0940875    .0044055   .0843518   .1035915
+
+. 
+. sum p42
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         p42 |         20    .1365933    .0062714   .1244235   .1443757
+
+. 
+. sum p43
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         p43 |         20    .2680318    .0027096   .2625872   .2759773
+
+. 
+. sum p44
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         p44 |         20    .5012874    .0098239   .4876829   .5201707
+
+. 
+. 
+end of do-file
